@@ -1,5 +1,5 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { useRef, useMemo, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Html, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllLanguages } from '../data/languages';
@@ -15,21 +15,14 @@ function latLngToVector3(lat, lng, radius) {
 }
 
 function EarthGlobe() {
-  const meshRef = useRef();
   const texture = useTexture('/textures/earth.jpg');
 
-  useFrame(() => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.0008;
-    }
-  });
-
   return (
-    <Sphere ref={meshRef} args={[2, 64, 64]}>
+    <Sphere args={[2, 64, 64]}>
       <meshStandardMaterial
         map={texture}
-        roughness={0.7}
-        metalness={0.1}
+        roughness={0.6}
+        metalness={0.05}
       />
     </Sphere>
   );
@@ -148,9 +141,10 @@ function GlobeScene({ onSelectLanguage }) {
 
   return (
     <>
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[5, 3, 5]} intensity={1.2} />
-      <pointLight position={[-10, -5, -10]} intensity={0.3} color="#4466ff" />
+      <ambientLight intensity={1.2} />
+      <directionalLight position={[5, 3, 5]} intensity={1.5} />
+      <directionalLight position={[-5, -2, -5]} intensity={0.6} />
+      <pointLight position={[0, 10, 0]} intensity={0.5} />
 
       <EarthGlobe />
       <Atmosphere />
