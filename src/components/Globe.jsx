@@ -1,6 +1,6 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, Html, Sphere } from '@react-three/drei';
+import { OrbitControls, Html, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllLanguages } from '../data/languages';
 
@@ -14,167 +14,67 @@ function latLngToVector3(lat, lng, radius) {
   return new THREE.Vector3(x, y, z);
 }
 
-function GlobeMesh() {
+function EarthGlobe() {
   const meshRef = useRef();
+  const texture = useTexture('/textures/earth.jpg');
 
   useFrame(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.001;
+      meshRef.current.rotation.y += 0.0008;
     }
   });
 
   return (
     <Sphere ref={meshRef} args={[2, 64, 64]}>
-      <meshPhongMaterial
-        color="#1a1a4e"
-        emissive="#0a0a2e"
-        specular="#4444aa"
-        shininess={15}
-        transparent
-        opacity={0.9}
+      <meshStandardMaterial
+        map={texture}
+        roughness={0.7}
+        metalness={0.1}
       />
     </Sphere>
   );
 }
 
-function GlobeGrid() {
-  const gridLines = useMemo(() => {
-    const lines = [];
-    // Latitude lines
-    for (let lat = -60; lat <= 60; lat += 30) {
-      const points = [];
-      for (let lng = 0; lng <= 360; lng += 5) {
-        points.push(latLngToVector3(lat, lng, 2.01));
-      }
-      lines.push(points);
-    }
-    // Longitude lines
-    for (let lng = 0; lng < 360; lng += 30) {
-      const points = [];
-      for (let lat = -90; lat <= 90; lat += 5) {
-        points.push(latLngToVector3(lat, lng, 2.01));
-      }
-      lines.push(points);
-    }
-    return lines;
-  }, []);
+// Atmospheric glow around the globe
+function Atmosphere() {
+  const meshRef = useRef();
 
   return (
-    <group>
-      {gridLines.map((points, i) => (
-        <line key={i}>
-          <bufferGeometry>
-            <bufferAttribute
-              attach="attributes-position"
-              count={points.length}
-              array={new Float32Array(points.flatMap(p => [p.x, p.y, p.z]))}
-              itemSize={3}
-            />
-          </bufferGeometry>
-          <lineBasicMaterial color="#3344aa" transparent opacity={0.2} />
-        </line>
-      ))}
-    </group>
+    <Sphere ref={meshRef} args={[2.06, 64, 64]}>
+      <meshBasicMaterial
+        color="#4488ff"
+        transparent
+        opacity={0.08}
+        side={THREE.BackSide}
+      />
+    </Sphere>
   );
 }
 
-// Simplified continent outlines as filled mesh regions
-function ContinentMeshes() {
-  const continentData = useMemo(() => {
-    // Rough continent outlines as lat/lng polygon centers with size
-    const regions = [
-      // North America
-      ...generateRegionDots(25, 70, -130, -60, 0.8),
-      // South America
-      ...generateRegionDots(-55, 10, -80, -35, 0.7),
-      // Europe
-      ...generateRegionDots(35, 70, -10, 40, 0.9),
-      // Africa
-      ...generateRegionDots(-35, 35, -20, 50, 0.7),
-      // Asia
-      ...generateRegionDots(10, 70, 60, 145, 0.6),
-      // Australia
-      ...generateRegionDots(-40, -12, 115, 155, 0.7),
-    ];
-    return regions;
-  }, []);
+function PulsingRing({ available }) {
+  const meshRef = useRef();
+
+  useFrame(({ clock }) => {
+    if (meshRef.current && available) {
+      const scale = 1 + Math.sin(clock.getElapsedTime() * 2) * 0.2;
+      meshRef.current.scale.setScalar(scale);
+      meshRef.current.material.opacity = 0.4 - Math.sin(clock.getElapsedTime() * 2) * 0.15;
+    }
+  });
+
+  if (!available) return null;
 
   return (
-    <group>
-      {continentData.map((pos, i) => (
-        <mesh key={i} position={pos}>
-          <sphereGeometry args={[0.03, 6, 6]} />
-          <meshBasicMaterial color="#2d6a4f" transparent opacity={0.6} />
-        </mesh>
-      ))}
-    </group>
+    <mesh ref={meshRef}>
+      <ringGeometry args={[0.08, 0.12, 32]} />
+      <meshBasicMaterial
+        color="#60a5fa"
+        transparent
+        opacity={0.4}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
   );
-}
-
-function generateRegionDots(latMin, latMax, lngMin, lngMax, density) {
-  const dots = [];
-  const step = 3 / density;
-  for (let lat = latMin; lat <= latMax; lat += step) {
-    for (let lng = lngMin; lng <= lngMax; lng += step) {
-      // Add some randomness to make it look more natural
-      if (isLand(lat, lng)) {
-        const pos = latLngToVector3(lat, lng, 2.015);
-        dots.push([pos.x, pos.y, pos.z]);
-      }
-    }
-  }
-  return dots;
-}
-
-// Very rough land detection
-function isLand(lat, lng) {
-  // North America
-  if (lat > 25 && lat < 70 && lng > -130 && lng < -60) {
-    if (lat > 48 && lng < -100) return lat < 65;
-    if (lat < 35 && lng < -100) return lng > -120;
-    return true;
-  }
-  // Central America
-  if (lat > 8 && lat < 25 && lng > -110 && lng < -75) return true;
-  // South America
-  if (lat > -55 && lat < 12 && lng > -82 && lng < -34) {
-    if (lat < -45) return lng > -75 && lng < -65;
-    return true;
-  }
-  // Europe
-  if (lat > 36 && lat < 71 && lng > -10 && lng < 40) {
-    if (lat > 60 && lng > 30) return false;
-    return true;
-  }
-  // UK
-  if (lat > 50 && lat < 59 && lng > -8 && lng < 2) return true;
-  // Africa
-  if (lat > -35 && lat < 37 && lng > -18 && lng < 52) {
-    if (lat > 20 && lng > 35) return lat > 25 ? false : true;
-    return true;
-  }
-  // Middle East
-  if (lat > 12 && lat < 42 && lng > 35 && lng < 60) return true;
-  // South Asia / India
-  if (lat > 8 && lat < 35 && lng > 68 && lng < 90) return true;
-  // Southeast Asia
-  if (lat > -8 && lat < 28 && lng > 95 && lng < 110) return true;
-  // East Asia / China / Korea / Japan
-  if (lat > 18 && lat < 55 && lng > 100 && lng < 145) {
-    if (lng > 130 && lat < 30) return false;
-    return true;
-  }
-  // Japan
-  if (lat > 30 && lat < 45 && lng > 129 && lng < 146) return true;
-  // Indonesia / Philippines
-  if (lat > -8 && lat < 18 && lng > 95 && lng < 140) {
-    return Math.random() > 0.4;
-  }
-  // Russia / Siberia
-  if (lat > 50 && lat < 72 && lng > 40 && lng < 180) return true;
-  // Australia
-  if (lat > -40 && lat < -12 && lng > 115 && lng < 155) return true;
-  return false;
 }
 
 function LanguagePin({ language, onClick }) {
@@ -206,18 +106,8 @@ function LanguagePin({ language, onClick }) {
         />
       </mesh>
 
-      {/* Pulse ring for available languages */}
-      {available && (
-        <mesh>
-          <ringGeometry args={[0.08, 0.12, 32]} />
-          <meshBasicMaterial
-            color="#60a5fa"
-            transparent
-            opacity={0.4}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-      )}
+      {/* Animated pulse ring for available languages */}
+      <PulsingRing available={available} />
 
       {/* Label */}
       {hovered && (
@@ -258,13 +148,12 @@ function GlobeScene({ onSelectLanguage }) {
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <pointLight position={[-10, -10, -10]} intensity={0.3} color="#4444ff" />
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[5, 3, 5]} intensity={1.2} />
+      <pointLight position={[-10, -5, -10]} intensity={0.3} color="#4466ff" />
 
-      <GlobeMesh />
-      <GlobeGrid />
-      <ContinentMeshes />
+      <EarthGlobe />
+      <Atmosphere />
 
       {languages.map((lang) => (
         <LanguagePin
@@ -281,6 +170,8 @@ function GlobeScene({ onSelectLanguage }) {
         maxDistance={8}
         autoRotate={false}
         rotateSpeed={0.5}
+        dampingFactor={0.1}
+        enableDamping
       />
     </>
   );
