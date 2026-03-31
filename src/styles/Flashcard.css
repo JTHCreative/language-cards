@@ -1,0 +1,105 @@
+.flashcard {
+  perspective: 1000px;
+  width: 340px;
+  height: 220px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.flashcard-front {
+  background: linear-gradient(135deg, #1e293b, #334155);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.flashcard-back {
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+  transform: rotateY(180deg);
+}
+
+.flashcard-label {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+.flashcard-text {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+}
+
+.flashcard-target {
+  font-size: 2.2rem;
+}
+
+.flashcard-pronunciation {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  margin: 8px 0 0;
+  font-style: italic;
+}
+
+.flashcard-hint {
+  position: absolute;
+  bottom: 12px;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.speak-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #a78bfa;
+  transition: all 0.2s;
+}
+
+.speak-btn:hover {
+  background: rgba(167, 139, 250, 0.2);
+  color: #c4b5fd;
+  transform: scale(1.1);
+}
