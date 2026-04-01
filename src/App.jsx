@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { getCurrentUser } from './utils/auth';
 import LoginPage from './pages/LoginPage';
 import GlobePage from './pages/GlobePage';
@@ -19,7 +19,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         {!user ? (
           <>
@@ -34,7 +34,7 @@ function App() {
           </>
         )}
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
