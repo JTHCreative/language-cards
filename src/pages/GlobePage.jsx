@@ -8,7 +8,7 @@ export default function GlobePage({ onLogout }) {
   const user = getCurrentUser();
 
   const handleSelectLanguage = (language) => {
-    navigate(`/practice/${language.id}`);
+    navigate(`/language/${language.id}`);
   };
 
   const handleLogout = () => {
@@ -35,7 +35,7 @@ export default function GlobePage({ onLogout }) {
       </div>
 
       <div className="globe-instructions">
-        <p>Drag to rotate the globe. Click a glowing pin to start learning!</p>
+        <p>Drag to rotate the globe. Click on a country's flag to learn their language!</p>
       </div>
     </div>
   );

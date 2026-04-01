@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { getCurrentUser } from './utils/auth';
 import LoginPage from './pages/LoginPage';
 import GlobePage from './pages/GlobePage';
+import LanguageHomePage from './pages/LanguageHomePage';
 import PracticePage from './pages/PracticePage';
 import './App.css';
 
@@ -27,6 +28,7 @@ function App() {
         ) : (
           <>
             <Route path="/" element={<GlobePage onLogout={handleLogout} />} />
+            <Route path="/language/:languageId" element={<LanguageHomePage />} />
             <Route path="/practice/:languageId" element={<PracticePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>

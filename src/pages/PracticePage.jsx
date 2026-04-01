@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Flashcard from '../components/Flashcard';
 import Flag from '../components/Flag';
 import { getLanguageById } from '../data/languages';
@@ -9,9 +9,11 @@ import '../styles/PracticePage.css';
 
 export default function PracticePage() {
   const { languageId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const language = getLanguageById(languageId);
   const user = getCurrentUser();
+  const difficultyLevel = searchParams.get('difficulty');
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -36,11 +38,17 @@ export default function PracticePage() {
   }
 
   const data = language.data;
-  const categories = data.categories;
+  const difficulty = difficultyLevel && data.difficulties
+    ? data.difficulties.find(d => d.level === difficultyLevel)
+    : null;
+  const categories = difficulty
+    ? data.categories.filter(c => difficulty.categories.includes(c.name))
+    : data.categories;
   const langCode =
     data.languageCode === 'yue' ? 'zh-HK' : data.languageCode;
   const flagCode = language.flagCode;
   const theme = language.theme;
+  const languageHomeUrl = `/language/${languageId}`;
 
   const themeVars = {
     '--theme-primary': theme.primary,
@@ -116,8 +124,8 @@ export default function PracticePage() {
               <button className="btn btn-secondary" onClick={resetSession}>
                 Pick Category
               </button>
-              <button className="btn btn-ghost" onClick={() => navigate('/')}>
-                Back to Globe
+              <button className="btn btn-ghost" onClick={() => navigate(languageHomeUrl)}>
+                Back to Home
               </button>
             </div>
           </div>
@@ -131,16 +139,16 @@ export default function PracticePage() {
     return (
       <div className="practice-page" style={themeVars}>
         <header className="practice-header">
-          <button className="back-btn" onClick={() => navigate('/')}>
+          <button className="back-btn" onClick={() => navigate(languageHomeUrl)}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5" />
               <polyline points="12 19 5 12 12 5" />
             </svg>
-            Globe
+            {data.languageName}
           </button>
           <div className="practice-title">
             <span className="title-flag"><Flag code={flagCode} size="2rem" /></span>
-            <h1>{data.nativeName}</h1>
+            <h1>{difficultyLevel || data.nativeName}</h1>
             <span className="practice-subtitle">{data.languageName} - {data.country}</span>
           </div>
           <div className="progress-badge">

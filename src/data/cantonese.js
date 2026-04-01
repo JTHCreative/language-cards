@@ -10,6 +10,31 @@ const cantoneseVocabulary = {
   countryCode: 'HK',
   coordinates: { lat: 22.3193, lng: 114.1694 },
 
+  description: 'Cantonese is a tonal language spoken by over 85 million people worldwide, primarily in the Guangdong province of southern China, Hong Kong, and Macau. Unlike Mandarin which has 4 tones, Cantonese has 6 tones \u2014 making it one of the most melodic and expressive Chinese dialects. It is the language of iconic Hong Kong cinema, Cantopop music, and a rich literary tradition. Cantonese preserves many features of ancient Chinese that have been lost in Mandarin, and its cuisine \u2014 including dim sum and roast meats \u2014 is celebrated globally. Learning Cantonese opens the door to a vibrant culture that blends traditional Chinese heritage with modern cosmopolitan life.',
+
+  difficulties: [
+    {
+      level: 'Novice',
+      description: 'Start with the basics \u2014 numbers, greetings, and simple everyday words.',
+      categories: ['Numbers', 'Greetings & Phrases', 'Colors'],
+    },
+    {
+      level: 'Beginner',
+      description: 'Build your foundation with family, food, and the days of the week.',
+      categories: ['Days of the Week', 'People & Family', 'Food & Drink'],
+    },
+    {
+      level: 'Advanced',
+      description: 'Expand into animals, body parts, and useful professions vocabulary.',
+      categories: ['Animals', 'Body Parts', 'Professions'],
+    },
+    {
+      level: 'Expert',
+      description: 'Challenge yourself with all categories including verbs and full phrases.',
+      categories: ['Common Verbs', 'Numbers', 'Days of the Week', 'Animals', 'People & Family', 'Professions', 'Greetings & Phrases', 'Food & Drink', 'Colors', 'Body Parts'],
+    },
+  ],
+
   categories: [
     {
       name: 'Numbers',
