@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import GlobePage from './pages/GlobePage';
 import LanguageHomePage from './pages/LanguageHomePage';
 import PracticePage from './pages/PracticePage';
+import ChallengePage from './pages/ChallengePage';
 import './App.css';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
             <Route path="/" element={<GlobePage onLogout={handleLogout} />} />
             <Route path="/language/:languageId" element={<LanguageHomePage />} />
             <Route path="/practice/:languageId" element={<PracticePage />} />
+            <Route path="/challenge/:code" element={<ChallengePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
         )}

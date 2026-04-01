@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Flag from '../components/Flag';
 import { getLanguageById } from '../data/languages';
+import { getCurrentUser } from '../utils/auth';
+import { createChallenge, joinChallenge } from '../utils/challenge';
 import '../styles/LanguageHomePage.css';
 
 const difficultyIcons = {
@@ -44,6 +47,12 @@ export default function LanguageHomePage() {
   const { languageId } = useParams();
   const navigate = useNavigate();
   const language = getLanguageById(languageId);
+  const user = getCurrentUser();
+
+  const [joinCode, setJoinCode] = useState('');
+  const [faceOffError, setFaceOffError] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [joining, setJoining] = useState(false);
 
   if (!language || !language.available) {
     return (
@@ -71,6 +80,38 @@ export default function LanguageHomePage() {
   };
 
   const totalWords = data.categories.reduce((sum, c) => sum + c.words.length, 0);
+
+  const handleCreateChallenge = async () => {
+    if (!user) return;
+    setFaceOffError('');
+    setCreating(true);
+    try {
+      const code = await createChallenge(user, languageId, data.categories);
+      navigate(`/challenge/${code}`);
+    } catch (err) {
+      setFaceOffError('Failed to create challenge. Try again.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleJoinChallenge = async () => {
+    if (!user || !joinCode.trim()) return;
+    setFaceOffError('');
+    setJoining(true);
+    try {
+      const result = await joinChallenge(joinCode.trim(), user);
+      if (result.success) {
+        navigate(`/challenge/${joinCode.trim()}`);
+      } else {
+        setFaceOffError(result.error);
+      }
+    } catch (err) {
+      setFaceOffError('Failed to join challenge. Try again.');
+    } finally {
+      setJoining(false);
+    }
+  };
 
   return (
     <div className="lang-home" style={themeVars}>
@@ -133,6 +174,63 @@ export default function LanguageHomePage() {
                 </button>
               );
             })}
+          </div>
+        </section>
+
+        {/* Face Off */}
+        <section className="faceoff-section">
+          <h2 className="section-heading">Face Off</h2>
+          <p className="faceoff-subtitle">Challenge a friend to a 10-word vocab showdown!</p>
+
+          {faceOffError && <div className="faceoff-error">{faceOffError}</div>}
+
+          <div className="faceoff-grid">
+            <div className="faceoff-card">
+              <div className="faceoff-card-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </div>
+              <h3>Create Challenge</h3>
+              <p>Generate a code and share it with your opponent</p>
+              <button
+                className="faceoff-btn faceoff-create"
+                onClick={handleCreateChallenge}
+                disabled={creating}
+              >
+                {creating ? 'Creating...' : 'Create Game'}
+              </button>
+            </div>
+
+            <div className="faceoff-card">
+              <div className="faceoff-card-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10 17 15 12 10 7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+              </div>
+              <h3>Join Challenge</h3>
+              <p>Enter a 6-digit code from your opponent</p>
+              <div className="faceoff-join-row">
+                <input
+                  type="text"
+                  className="faceoff-input"
+                  placeholder="Enter code"
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  maxLength={6}
+                  disabled={joining}
+                />
+                <button
+                  className="faceoff-btn faceoff-join"
+                  onClick={handleJoinChallenge}
+                  disabled={joining || joinCode.length < 6}
+                >
+                  {joining ? 'Joining...' : 'Join'}
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       </div>
