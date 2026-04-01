@@ -6,6 +6,9 @@ export default function LoginPage({ onLogin }) {
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -16,7 +19,7 @@ export default function LoginPage({ onLogin }) {
 
     try {
       const result = isSignup
-        ? await signup(username, password)
+        ? await signup(username, password, firstName, lastName, email)
         : await login(username, password);
 
       if (result.success) {
@@ -45,8 +48,35 @@ export default function LoginPage({ onLogin }) {
 
           {error && <div className="login-error">{error}</div>}
 
+          {isSignup && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="firstName">First Name *</label>
+                <input
+                  id="firstName"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="First name"
+                  disabled={submitting}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="lastName">Last Name</label>
+                <input
+                  id="lastName"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Last name"
+                  disabled={submitting}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">Username *</label>
             <input
               id="username"
               type="text"
@@ -58,14 +88,28 @@ export default function LoginPage({ onLogin }) {
             />
           </div>
 
+          {isSignup && (
+            <div className="form-group">
+              <label htmlFor="email">Email (optional)</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                disabled={submitting}
+              />
+            </div>
+          )}
+
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Password *</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password (min 6 characters)"
+              placeholder={isSignup ? 'Min 6 characters' : 'Enter your password'}
               autoComplete={isSignup ? 'new-password' : 'current-password'}
               disabled={submitting}
             />

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Flag from '../components/Flag';
+import ProfileButton from '../components/ProfileButton';
 import { getLanguageById } from '../data/languages';
 import { getCurrentUser } from '../utils/auth';
 import { createChallenge, joinChallenge } from '../utils/challenge';
@@ -43,7 +44,7 @@ const difficultyColors = {
   Expert: '#ef4444',
 };
 
-export default function LanguageHomePage() {
+export default function LanguageHomePage({ user: userProp, onLogout }) {
   const { languageId } = useParams();
   const navigate = useNavigate();
   const language = getLanguageById(languageId);
@@ -131,6 +132,7 @@ export default function LanguageHomePage() {
         </div>
         <div className="lang-home-header-right">
           <div className="word-count-badge">{totalWords} words</div>
+          <ProfileButton user={userProp} onLogout={onLogout} />
         </div>
       </header>
 

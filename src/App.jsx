@@ -54,9 +54,9 @@ function App() {
           </>
         ) : (
           <>
-            <Route path="/" element={<GlobePage onLogout={handleLogout} />} />
-            <Route path="/language/:languageId" element={<LanguageHomePage />} />
-            <Route path="/practice/:languageId" element={<PracticePage />} />
+            <Route path="/" element={<GlobePage user={user} onLogout={handleLogout} />} />
+            <Route path="/language/:languageId" element={<LanguageHomePage user={user} onLogout={handleLogout} />} />
+            <Route path="/practice/:languageId" element={<PracticePage user={user} onLogout={handleLogout} />} />
             <Route path="/challenge/:code" element={<ChallengePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </>
