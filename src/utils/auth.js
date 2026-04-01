@@ -6,7 +6,7 @@ import {
   updateProfile,
   updatePassword,
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { auth, db } from './firebase';
 
 // Convert username to a fake email for Firebase Auth (which requires email)
@@ -154,6 +154,36 @@ export const getProgress = async (uid, languageId) => {
     return snap.exists() ? snap.data() : {};
   } catch {
     return {};
+  }
+};
+
+// Challenge stats stored in users/{uid} under challengeStats field
+export const recordChallengeResult = async (uid, correctCount, totalCount, won) => {
+  try {
+    await setDoc(doc(db, 'users', uid), {
+      challengeStats: {
+        played: increment(1),
+        won: increment(won === true ? 1 : 0),
+        lost: increment(won === false ? 1 : 0),
+        tied: increment(won === null ? 1 : 0),
+        wordsCorrect: increment(correctCount),
+        wordsTotal: increment(totalCount),
+      },
+    }, { merge: true });
+  } catch (err) {
+    console.error('Failed to record challenge result:', err);
+  }
+};
+
+export const getChallengeStats = async (uid) => {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if (snap.exists() && snap.data().challengeStats) {
+      return snap.data().challengeStats;
+    }
+    return { played: 0, won: 0, lost: 0, tied: 0, wordsCorrect: 0, wordsTotal: 0 };
+  } catch {
+    return { played: 0, won: 0, lost: 0, tied: 0, wordsCorrect: 0, wordsTotal: 0 };
   }
 };
 
