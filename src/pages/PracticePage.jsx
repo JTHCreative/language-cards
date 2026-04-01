@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Flashcard from '../components/Flashcard';
 import Flag from '../components/Flag';
@@ -19,10 +19,18 @@ export default function PracticePage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showResults, setShowResults] = useState(false);
   const [sessionResults, setSessionResults] = useState([]);
+  const [progress, setProgress] = useState({});
 
   useEffect(() => {
     loadVoices();
   }, []);
+
+  // Load progress from Firestore
+  useEffect(() => {
+    if (user?.uid && languageId) {
+      getProgress(user.uid, languageId).then(setProgress);
+    }
+  }, [user?.uid, languageId]);
 
   if (!language || !language.available) {
     return (
@@ -63,18 +71,21 @@ export default function PracticePage() {
 
   const currentWord = currentWords[currentIndex];
 
-  const progress = user ? getProgress(user.username, languageId) : {};
   const totalWords = categories.reduce((sum, c) => sum + c.words.length, 0);
   const knownCount = Object.values(progress).filter((p) => p.known).length;
 
   const handleKnow = () => {
-    if (user) saveProgress(user.username, languageId, `${selectedCategory}_${currentIndex}`, true);
+    const key = `${selectedCategory}_${currentIndex}`;
+    if (user?.uid) saveProgress(user.uid, languageId, key, true);
+    setProgress(prev => ({ ...prev, [key]: { known: true } }));
     setSessionResults([...sessionResults, { word: currentWord, known: true }]);
     advance();
   };
 
   const handleDontKnow = () => {
-    if (user) saveProgress(user.username, languageId, `${selectedCategory}_${currentIndex}`, false);
+    const key = `${selectedCategory}_${currentIndex}`;
+    if (user?.uid) saveProgress(user.uid, languageId, key, false);
+    setProgress(prev => ({ ...prev, [key]: { known: false } }));
     setSessionResults([...sessionResults, { word: currentWord, known: false }]);
     advance();
   };
@@ -111,8 +122,7 @@ export default function PracticePage() {
       } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
         handleDontKnow();
       } else if (e.key === ' ') {
-        e.preventDefault(); // prevent page scroll
-        // flip card — handled by Flashcard onClick, but we can't access it here
+        e.preventDefault();
       }
     };
 

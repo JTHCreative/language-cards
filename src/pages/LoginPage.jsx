@@ -7,19 +7,27 @@ export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSubmitting(true);
 
-    const result = isSignup
-      ? signup(username, password)
-      : login(username, password);
+    try {
+      const result = isSignup
+        ? await signup(username, password)
+        : await login(username, password);
 
-    if (result.success) {
-      onLogin(result.user);
-    } else {
-      setError(result.error);
+      if (result.success) {
+        onLogin(result.user);
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -46,6 +54,7 @@ export default function LoginPage({ onLogin }) {
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
               autoComplete="username"
+              disabled={submitting}
             />
           </div>
 
@@ -56,13 +65,14 @@ export default function LoginPage({ onLogin }) {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Enter your password (min 6 characters)"
               autoComplete={isSignup ? 'new-password' : 'current-password'}
+              disabled={submitting}
             />
           </div>
 
-          <button type="submit" className="login-btn">
-            {isSignup ? 'Sign Up' : 'Log In'}
+          <button type="submit" className="login-btn" disabled={submitting}>
+            {submitting ? 'Please wait...' : (isSignup ? 'Sign Up' : 'Log In')}
           </button>
 
           <p className="toggle-mode">
@@ -71,6 +81,7 @@ export default function LoginPage({ onLogin }) {
               type="button"
               className="link-btn"
               onClick={() => { setIsSignup(!isSignup); setError(''); }}
+              disabled={submitting}
             >
               {isSignup ? 'Log In' : 'Sign Up'}
             </button>
