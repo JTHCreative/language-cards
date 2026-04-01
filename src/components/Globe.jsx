@@ -29,6 +29,16 @@ function EarthGlobe() {
   );
 }
 
+// Milky Way / starfield skybox
+function Starfield() {
+  const texture = useTexture('/textures/starfield.jpg');
+  return (
+    <Sphere args={[50, 64, 64]}>
+      <meshBasicMaterial map={texture} side={THREE.BackSide} />
+    </Sphere>
+  );
+}
+
 // Atmospheric glow around the globe
 function Atmosphere() {
   return (
@@ -126,6 +136,7 @@ function GlobeScene({ onSelectLanguage }) {
       <directionalLight position={[-5, -2, -5]} intensity={0.6} />
       <pointLight position={[0, 10, 0]} intensity={0.5} />
 
+      <Starfield />
       <EarthGlobe />
       <Atmosphere />
 
