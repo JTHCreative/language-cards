@@ -1,5 +1,5 @@
 .lang-home {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(180deg, var(--theme-bg1, #0a0a1a) 0%, var(--theme-bg2, #0f0c29) 50%, #0a0a12 100%);
   display: flex;
   flex-direction: column;
@@ -189,10 +189,25 @@
 
 /* Responsive */
 @media (max-width: 640px) {
+  .lang-home-header {
+    padding: 12px 16px;
+  }
+
+  .lang-home-title h1 {
+    font-size: 1.1rem;
+  }
+
+  .lang-home-content {
+    padding: 24px 16px;
+  }
+
   .lang-intro {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding: 20px 16px;
+    gap: 20px;
+    margin-bottom: 32px;
   }
 
   .lang-intro-text h2 {
@@ -201,7 +216,44 @@
     gap: 4px;
   }
 
+  .lang-native {
+    font-size: 1.4rem;
+  }
+
+  .lang-description {
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .section-heading {
+    font-size: 1.05rem;
+  }
+
   .difficulty-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .difficulty-card {
+    padding: 20px 14px;
+    gap: 8px;
+  }
+
+  .diff-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .diff-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .diff-level {
+    font-size: 0.95rem;
+  }
+
+  .diff-description {
+    font-size: 0.75rem;
   }
 }

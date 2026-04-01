@@ -1,5 +1,5 @@
 .login-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,4 +151,20 @@
 
 .link-btn:hover {
   color: #c4b5fd;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 20px;
+    margin: 16px;
+    border-radius: 18px;
+  }
+
+  .login-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .login-header {
+    margin-bottom: 24px;
+  }
 }
