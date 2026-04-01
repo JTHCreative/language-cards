@@ -1,5 +1,5 @@
 import {
-  doc, getDoc, setDoc, updateDoc, onSnapshot, deleteDoc,
+  doc, getDoc, setDoc, updateDoc, onSnapshot, deleteDoc, Timestamp,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -32,6 +32,7 @@ export const createChallenge = async (user, languageId, categories) => {
     guest: null,
     status: 'waiting', // waiting -> ready -> playing -> finished
     createdAt: Date.now(),
+    expiresAt: Timestamp.fromDate(new Date(Date.now() + 24 * 60 * 60 * 1000)), // TTL: auto-delete after 24h
   };
 
   await setDoc(doc(db, 'challenges', code), challengeData);
