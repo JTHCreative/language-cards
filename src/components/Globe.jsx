@@ -1,5 +1,5 @@
-import { useRef, useMemo, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useMemo, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Html, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllLanguages } from '../data/languages';
@@ -44,94 +44,79 @@ function Atmosphere() {
   );
 }
 
-function PulsingRing({ available }) {
-  const meshRef = useRef();
-
-  useFrame(({ clock }) => {
-    if (meshRef.current && available) {
-      const scale = 1 + Math.sin(clock.getElapsedTime() * 2) * 0.2;
-      meshRef.current.scale.setScalar(scale);
-      meshRef.current.material.opacity = 0.4 - Math.sin(clock.getElapsedTime() * 2) * 0.15;
-    }
-  });
-
-  if (!available) return null;
-
-  return (
-    <mesh ref={meshRef}>
-      <ringGeometry args={[0.08, 0.12, 32]} />
-      <meshBasicMaterial
-        color="#60a5fa"
-        transparent
-        opacity={0.4}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
-
-function LanguagePin({ language, onClick }) {
+function LanguageFlag({ language, onClick }) {
   const [hovered, setHovered] = useState(false);
   const coords = language.data?.coordinates || language.coordinates;
   const name = language.data?.languageName || language.languageName;
   const country = language.data?.country || language.country;
   const available = language.available;
+  const flag = language.flag;
 
   const position = useMemo(
-    () => latLngToVector3(coords.lat, coords.lng, 2.05),
+    () => latLngToVector3(coords.lat, coords.lng, 2.08),
     [coords]
   );
 
   return (
     <group position={position}>
-      {/* Pin dot */}
-      <mesh
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (available) onClick(language);
-        }}
-      >
-        <sphereGeometry args={[hovered ? 0.08 : 0.06, 16, 16]} />
-        <meshBasicMaterial
-          color={available ? (hovered ? '#fbbf24' : '#60a5fa') : '#6b7280'}
-        />
-      </mesh>
-
-      {/* Animated pulse ring for available languages */}
-      <PulsingRing available={available} />
-
-      {/* Label */}
-      {hovered && (
-        <Html
-          position={[0, 0.15, 0]}
-          center
-          style={{ pointerEvents: 'none' }}
+      <Html center>
+        <div
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
+          onClick={() => available && onClick(language)}
+          style={{
+            cursor: available ? 'pointer' : 'default',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            userSelect: 'none',
+          }}
         >
+          {/* Flag */}
           <div
             style={{
-              background: available
-                ? 'rgba(59, 130, 246, 0.9)'
-                : 'rgba(107, 114, 128, 0.9)',
-              color: '#fff',
-              padding: '6px 12px',
-              borderRadius: '8px',
-              fontSize: '13px',
-              fontWeight: 600,
-              whiteSpace: 'nowrap',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.2)',
+              fontSize: hovered ? '32px' : '24px',
+              transition: 'all 0.2s ease',
+              filter: available ? 'none' : 'grayscale(0.6) opacity(0.6)',
+              transform: hovered ? 'translateY(-4px)' : 'none',
+              textShadow: available
+                ? '0 2px 8px rgba(0,0,0,0.5)'
+                : 'none',
             }}
           >
-            <div>{name}</div>
-            <div style={{ fontSize: '11px', opacity: 0.8 }}>
-              {country}
-              {!available && ' (Coming Soon)'}
-            </div>
+            {flag}
           </div>
-        </Html>
-      )}
+
+          {/* Tooltip on hover */}
+          {hovered && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                marginTop: '4px',
+                background: available
+                  ? 'rgba(59, 130, 246, 0.9)'
+                  : 'rgba(107, 114, 128, 0.9)',
+                color: '#fff',
+                padding: '5px 10px',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                pointerEvents: 'none',
+              }}
+            >
+              <div>{name}</div>
+              <div style={{ fontSize: '10px', opacity: 0.8, fontWeight: 400 }}>
+                {country}
+                {!available && ' (Coming Soon)'}
+              </div>
+            </div>
+          )}
+        </div>
+      </Html>
     </group>
   );
 }
@@ -150,7 +135,7 @@ function GlobeScene({ onSelectLanguage }) {
       <Atmosphere />
 
       {languages.map((lang) => (
-        <LanguagePin
+        <LanguageFlag
           key={lang.id}
           language={lang}
           onClick={onSelectLanguage}
