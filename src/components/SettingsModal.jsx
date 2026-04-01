@@ -63,13 +63,8 @@ export default function SettingsModal({ user, onClose, onLogout }) {
     }
   };
 
-  const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) onClose();
-  };
-
   return (
-    <div className="settings-overlay" onClick={handleOverlayClick}>
-      <div className="settings-modal">
+    <div className="settings-dropdown">
         <div className="settings-header">
           <h2>Account Settings</h2>
           <button className="settings-close" onClick={onClose} aria-label="Close">
@@ -148,6 +143,5 @@ export default function SettingsModal({ user, onClose, onLogout }) {
           </div>
         )}
       </div>
-    </div>
   );
 }

@@ -1,37 +1,40 @@
-.settings-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #1a1a2e;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  width: 360px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  padding: 24px;
+  animation: dropdownIn 0.15s ease-out;
 }
 
-.settings-modal {
-  background: #1a1a2e;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  width: 100%;
-  max-width: 440px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .settings-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .settings-header h2 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #fff;
 }
@@ -40,8 +43,8 @@
   background: rgba(255, 255, 255, 0.08);
   border: none;
   border-radius: 8px;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,11 +59,11 @@
 }
 
 .settings-body {
-  padding: 20px 24px 24px;
+  padding: 16px 20px 20px;
 }
 
 .settings-loading {
-  padding: 40px;
+  padding: 32px;
   text-align: center;
   color: rgba(255, 255, 255, 0.4);
 }
@@ -69,25 +72,25 @@
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.25);
   color: #fca5a5;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 0.84rem;
-  margin-bottom: 16px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 14px;
 }
 
 .settings-success {
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(16, 185, 129, 0.25);
   color: #6ee7b7;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 0.84rem;
-  margin-bottom: 16px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 14px;
 }
 
 .settings-row {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .settings-row .settings-field {
@@ -96,25 +99,25 @@
 }
 
 .settings-field {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .settings-field label {
   display: block;
   color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 500;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .settings-field input {
   width: 100%;
-  padding: 11px 14px;
+  padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
+  border-radius: 9px;
   background: rgba(255, 255, 255, 0.06);
   color: #fff;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s;
@@ -135,25 +138,25 @@
 
 .settings-hint {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.3);
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .settings-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 6px;
 }
 
 .settings-save {
   flex: 1;
-  padding: 12px;
+  padding: 10px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #7c3aed, #3b82f6);
   color: #fff;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -170,12 +173,12 @@
 }
 
 .settings-logout {
-  padding: 12px 20px;
+  padding: 10px 16px;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(239, 68, 68, 0.08);
   color: #fca5a5;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -187,22 +190,25 @@
 }
 
 @media (max-width: 480px) {
-  .settings-overlay {
-    padding: 16px;
-    align-items: flex-start;
-    padding-top: 40px;
+  .settings-dropdown {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0;
+    animation: slideUp 0.2s ease-out;
   }
 
-  .settings-modal {
-    border-radius: 16px;
-  }
-
-  .settings-header {
-    padding: 16px 18px;
-  }
-
-  .settings-body {
-    padding: 16px 18px 20px;
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 
   .settings-actions {
