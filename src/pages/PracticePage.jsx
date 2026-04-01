@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Flashcard from '../components/Flashcard';
+import Flag from '../components/Flag';
 import { getLanguageById } from '../data/languages';
 import { getCurrentUser, getProgress, saveProgress } from '../utils/auth';
 import { loadVoices } from '../utils/speech';
@@ -38,7 +39,7 @@ export default function PracticePage() {
   const categories = data.categories;
   const langCode =
     data.languageCode === 'yue' ? 'zh-HK' : data.languageCode;
-  const flag = language.flag;
+  const flagCode = language.flagCode;
   const theme = language.theme;
 
   const themeVars = {
@@ -100,7 +101,7 @@ export default function PracticePage() {
       <div className="practice-page" style={themeVars}>
         <div className="practice-content">
           <div className="results-card">
-            <span className="results-flag">{flag}</span>
+            <span className="results-flag"><Flag code={flagCode} size="3rem" /></span>
             <h2>Session Complete!</h2>
             <div className="results-score">
               <span className="score-number">{correct}</span>
@@ -138,7 +139,7 @@ export default function PracticePage() {
             Globe
           </button>
           <div className="practice-title">
-            <span className="title-flag">{flag}</span>
+            <span className="title-flag"><Flag code={flagCode} size="2rem" /></span>
             <h1>{data.nativeName}</h1>
             <span className="practice-subtitle">{data.languageName} - {data.country}</span>
           </div>
@@ -159,20 +160,6 @@ export default function PracticePage() {
               <span className="category-count">{cat.words.length} words</span>
             </button>
           ))}
-          <button
-            className="category-card category-all"
-            onClick={() => {
-              // combine all words into one session
-              const allCat = { name: 'All Words', words: categories.flatMap(c => c.words) };
-              // Temporarily add to data
-              startCategory('__all__');
-            }}
-            style={{ display: 'none' }} // hidden for now
-          >
-            <span className="category-icon">🌟</span>
-            <span className="category-name">All Words</span>
-            <span className="category-count">{totalWords} words</span>
-          </button>
         </div>
       </div>
     );
@@ -190,7 +177,7 @@ export default function PracticePage() {
           Categories
         </button>
         <div className="practice-title">
-          <span className="title-flag">{flag}</span>
+          <span className="title-flag"><Flag code={flagCode} size="2rem" /></span>
           <h1>{selectedCategory}</h1>
           <span className="practice-subtitle">{data.languageName}</span>
         </div>
@@ -209,7 +196,7 @@ export default function PracticePage() {
 
         {currentWord && (
           <>
-            <Flashcard word={currentWord} languageCode={langCode} flag={flag} />
+            <Flashcard word={currentWord} languageCode={langCode} flagCode={flagCode} />
 
             <div className="practice-actions">
               <button className="btn btn-wrong" onClick={handleDontKnow}>

@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Html, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllLanguages } from '../data/languages';
+import Flag from './Flag';
 
 // Convert lat/lng to 3D position on sphere
 function latLngToVector3(lat, lng, radius) {
@@ -48,7 +49,7 @@ function LanguageFlag({ language, onClick }) {
   const name = language.data?.languageName || language.languageName;
   const country = language.data?.country || language.country;
   const available = language.available;
-  const flag = language.flag;
+  const flagCode = language.flagCode;
 
   const position = useMemo(
     () => latLngToVector3(coords.lat, coords.lng, 2.08),
@@ -73,16 +74,12 @@ function LanguageFlag({ language, onClick }) {
           {/* Flag */}
           <div
             style={{
-              fontSize: hovered ? '32px' : '24px',
               transition: 'all 0.2s ease',
-              filter: available ? 'none' : 'grayscale(0.6) opacity(0.6)',
-              transform: hovered ? 'translateY(-4px)' : 'none',
-              textShadow: available
-                ? '0 2px 8px rgba(0,0,0,0.5)'
-                : 'none',
+              filter: available ? 'drop-shadow(0 2px 6px rgba(0,0,0,0.5))' : 'grayscale(0.6) opacity(0.6)',
+              transform: hovered ? 'translateY(-4px) scale(1.3)' : 'none',
             }}
           >
-            {flag}
+            <Flag code={flagCode} size={hovered ? '28px' : '22px'} />
           </div>
 
           {/* Tooltip on hover */}
