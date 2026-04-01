@@ -152,6 +152,82 @@
   }
 }
 
+/* Challenge Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 12px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.stat-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-sub {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.stats-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stats-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.stats-detail-row:last-child {
+  border-bottom: none;
+}
+
+.stats-detail-row span:first-child {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.stats-detail-row span:last-child {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+}
+
+.stats-empty {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.stats-empty p {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
 /* Fields */
 .settings-row {
   display: flex;
@@ -275,5 +351,9 @@
     to {
       transform: translateY(0);
     }
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

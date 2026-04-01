@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getCurrentUser } from '../utils/auth';
+import { getCurrentUser, recordChallengeResult } from '../utils/auth';
 import { onChallengeUpdate, confirmParticipation, submitScore, deleteChallenge } from '../utils/challenge';
 import { getLanguageById } from '../data/languages';
 import { speak, cancelSpeech, loadVoices } from '../utils/speech';
@@ -85,6 +85,24 @@ export default function ChallengePage() {
 
   const inputRef = useRef(null);
   const timerRef = useRef(null);
+  const statsRecorded = useRef(false);
+
+  // Record challenge stats when both players finish
+  useEffect(() => {
+    if (!challenge || challenge.status !== 'finished' || statsRecorded.current || !user?.uid) return;
+    statsRecorded.current = true;
+
+    const isHost = user.uid === challenge.host.uid;
+    const myScore = isHost ? challenge.host.score : challenge.guest?.score;
+    const opScore = isHost ? challenge.guest?.score : challenge.host.score;
+    const totalWords = challenge.words.length;
+
+    let won = null; // null = tie
+    if (myScore > opScore) won = true;
+    else if (myScore < opScore) won = false;
+
+    recordChallengeResult(user.uid, myScore ?? 0, totalWords, won);
+  }, [challenge?.status]);
 
   // Load speech voices and cancel on unmount
   useEffect(() => {
