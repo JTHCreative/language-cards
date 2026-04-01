@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../utils/auth';
 import { onChallengeUpdate, confirmParticipation, submitScore } from '../utils/challenge';
 import { getLanguageById } from '../data/languages';
+import { speak, cancelSpeech, loadVoices } from '../utils/speech';
 import Flag from '../components/Flag';
 import '../styles/ChallengePage.css';
 
@@ -27,6 +28,12 @@ export default function ChallengePage() {
 
   const inputRef = useRef(null);
   const timerRef = useRef(null);
+
+  // Load speech voices and cancel on unmount
+  useEffect(() => {
+    loadVoices();
+    return () => cancelSpeech();
+  }, []);
 
   // Listen to challenge updates
   useEffect(() => {
@@ -97,6 +104,7 @@ export default function ChallengePage() {
   const opponentData = isHost ? challenge.guest : challenge.host;
   const language = getLanguageById(challenge.languageId);
   const flagCode = language?.flagCode;
+  const speechLangCode = language?.speechLangCode || language?.data?.languageCode || 'zh-HK';
   const theme = language?.theme || {};
 
   const themeVars = {
@@ -254,6 +262,18 @@ export default function ChallengePage() {
             <span className="game-word-label">What does this mean?</span>
             <p className="game-word">{currentWord?.target}</p>
             <p className="game-word-pronunciation">{currentWord?.pronunciation}</p>
+            <button
+              className="game-speak-btn"
+              onClick={() => speak(currentWord?.target, speechLangCode)}
+              aria-label="Listen to pronunciation"
+              title="Listen to pronunciation"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              </svg>
+            </button>
           </div>
 
           <div className="game-input-area">
