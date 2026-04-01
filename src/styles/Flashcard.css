@@ -1,6 +1,6 @@
 .flashcard {
   perspective: 1000px;
-  width: 340px;
+  width: min(340px, calc(100vw - 48px));
   height: 220px;
   cursor: pointer;
   user-select: none;
@@ -118,4 +118,31 @@
   background: color-mix(in srgb, var(--theme-primary, #a78bfa) 25%, transparent);
   color: #fff;
   transform: scale(1.1);
+}
+
+@media (max-width: 480px) {
+  .flashcard {
+    height: 200px;
+  }
+
+  .flashcard-face {
+    padding: 20px 16px;
+  }
+
+  .flashcard-text {
+    font-size: 1.3rem;
+  }
+
+  .flashcard-target {
+    font-size: 1.8rem;
+  }
+
+  .flashcard-pronunciation {
+    font-size: 0.85rem;
+  }
+
+  .speak-btn {
+    width: 44px;
+    height: 44px;
+  }
 }

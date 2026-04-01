@@ -1,5 +1,5 @@
 .practice-page {
-  min-height: 100vh;
+  min-height: 100dvh;
   background: linear-gradient(180deg, var(--theme-bg1, #0a0a1a) 0%, var(--theme-bg2, #0f0c29) 50%, #0a0a12 100%);
   display: flex;
   flex-direction: column;
@@ -125,7 +125,7 @@
 }
 
 .progress-bar-container {
-  width: 340px;
+  width: min(340px, calc(100vw - 48px));
   height: 4px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 2px;
@@ -274,4 +274,95 @@
   justify-content: center;
   gap: 20px;
   color: #fff;
+}
+
+@media (max-width: 480px) {
+  .practice-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .back-btn {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .back-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .title-flag {
+    font-size: 1.5rem;
+  }
+
+  .practice-title h1 {
+    font-size: 1.05rem;
+  }
+
+  .practice-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .progress-badge {
+    padding: 5px 10px;
+    font-size: 0.7rem;
+  }
+
+  .category-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .category-card {
+    padding: 16px 12px;
+    gap: 6px;
+  }
+
+  .category-icon {
+    font-size: 1.5rem;
+  }
+
+  .category-name {
+    font-size: 0.85rem;
+  }
+
+  .practice-content {
+    padding: 20px 16px;
+    gap: 24px;
+  }
+
+  .practice-actions {
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    font-size: 0.85rem;
+  }
+
+  .results-card {
+    padding: 28px 20px;
+    border-radius: 18px;
+    margin: 0 8px;
+  }
+
+  .score-number {
+    font-size: 3rem;
+  }
+
+  .score-divider,
+  .score-total {
+    font-size: 1.5rem;
+  }
+
+  .results-actions {
+    gap: 8px;
+  }
+
+  .results-actions .btn {
+    padding: 10px 18px;
+    font-size: 0.82rem;
+  }
 }
