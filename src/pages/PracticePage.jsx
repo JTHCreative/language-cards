@@ -38,6 +38,16 @@ export default function PracticePage() {
   const categories = data.categories;
   const langCode =
     data.languageCode === 'yue' ? 'zh-HK' : data.languageCode;
+  const flag = language.flag;
+  const theme = language.theme;
+
+  const themeVars = {
+    '--theme-primary': theme.primary,
+    '--theme-secondary': theme.secondary,
+    '--theme-accent': theme.accent,
+    '--theme-bg1': theme.bg1,
+    '--theme-bg2': theme.bg2,
+  };
 
   const currentWords = selectedCategory
     ? categories.find((c) => c.name === selectedCategory)?.words || []
@@ -87,9 +97,10 @@ export default function PracticePage() {
   if (showResults) {
     const correct = sessionResults.filter((r) => r.known).length;
     return (
-      <div className="practice-page">
+      <div className="practice-page" style={themeVars}>
         <div className="practice-content">
           <div className="results-card">
+            <span className="results-flag">{flag}</span>
             <h2>Session Complete!</h2>
             <div className="results-score">
               <span className="score-number">{correct}</span>
@@ -117,7 +128,7 @@ export default function PracticePage() {
   // Category selection
   if (!selectedCategory) {
     return (
-      <div className="practice-page">
+      <div className="practice-page" style={themeVars}>
         <header className="practice-header">
           <button className="back-btn" onClick={() => navigate('/')}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -127,6 +138,7 @@ export default function PracticePage() {
             Globe
           </button>
           <div className="practice-title">
+            <span className="title-flag">{flag}</span>
             <h1>{data.nativeName}</h1>
             <span className="practice-subtitle">{data.languageName} - {data.country}</span>
           </div>
@@ -168,7 +180,7 @@ export default function PracticePage() {
 
   // Flashcard practice
   return (
-    <div className="practice-page">
+    <div className="practice-page" style={themeVars}>
       <header className="practice-header">
         <button className="back-btn" onClick={resetSession}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -178,6 +190,7 @@ export default function PracticePage() {
           Categories
         </button>
         <div className="practice-title">
+          <span className="title-flag">{flag}</span>
           <h1>{selectedCategory}</h1>
           <span className="practice-subtitle">{data.languageName}</span>
         </div>
@@ -196,7 +209,7 @@ export default function PracticePage() {
 
         {currentWord && (
           <>
-            <Flashcard word={currentWord} languageCode={langCode} />
+            <Flashcard word={currentWord} languageCode={langCode} flag={flag} />
 
             <div className="practice-actions">
               <button className="btn btn-wrong" onClick={handleDontKnow}>

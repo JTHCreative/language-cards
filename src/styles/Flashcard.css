@@ -32,15 +32,19 @@
 }
 
 .flashcard-front {
-  background: linear-gradient(135deg, #1e293b, #334155);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--theme-primary, #1e293b) 25%, #1a1a2e),
+    color-mix(in srgb, var(--theme-primary, #334155) 15%, #252540));
+  border: 1px solid color-mix(in srgb, var(--theme-primary, #fff) 20%, transparent);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
 .flashcard-back {
-  background: linear-gradient(135deg, #1e1b4b, #312e81);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--theme-secondary, #1e1b4b) 30%, #1a1a2e),
+    color-mix(in srgb, var(--theme-primary, #312e81) 20%, #252540));
+  border: 1px solid color-mix(in srgb, var(--theme-accent, #8b5cf6) 30%, transparent);
+  box-shadow: 0 10px 40px color-mix(in srgb, var(--theme-primary, #6366f1) 20%, transparent);
   transform: rotateY(180deg);
 }
 
@@ -55,6 +59,13 @@
   font-weight: 600;
 }
 
+.flashcard-flag {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 1.2rem;
+}
+
 .flashcard-text {
   font-size: 1.6rem;
   font-weight: 700;
@@ -65,13 +76,18 @@
 
 .flashcard-target {
   font-size: 2.2rem;
+  background: linear-gradient(135deg, var(--theme-accent, #fff), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .flashcard-pronunciation {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--theme-accent, rgba(255, 255, 255, 0.6));
   font-size: 0.95rem;
   margin: 8px 0 0;
   font-style: italic;
+  opacity: 0.7;
 }
 
 .flashcard-hint {
@@ -85,8 +101,8 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--theme-primary, #fff) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-accent, #fff) 25%, transparent);
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -94,12 +110,12 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #a78bfa;
+  color: var(--theme-accent, #a78bfa);
   transition: all 0.2s;
 }
 
 .speak-btn:hover {
-  background: rgba(167, 139, 250, 0.2);
-  color: #c4b5fd;
+  background: color-mix(in srgb, var(--theme-primary, #a78bfa) 25%, transparent);
+  color: #fff;
   transform: scale(1.1);
 }

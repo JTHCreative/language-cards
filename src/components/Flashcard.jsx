@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { speak } from '../utils/speech';
 import '../styles/Flashcard.css';
 
-export default function Flashcard({ word, languageCode }) {
+export default function Flashcard({ word, languageCode, flag }) {
   const [flipped, setFlipped] = useState(false);
 
   const handleSpeak = (e) => {
@@ -19,6 +19,7 @@ export default function Flashcard({ word, languageCode }) {
         {/* Front - English */}
         <div className="flashcard-face flashcard-front">
           <span className="flashcard-label">English</span>
+          {flag && <span className="flashcard-flag">{flag}</span>}
           <p className="flashcard-text">{word.english}</p>
           <span className="flashcard-hint">Click to flip</span>
         </div>
