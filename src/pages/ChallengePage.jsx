@@ -10,6 +10,63 @@ import '../styles/ChallengePage.css';
 const ROUND_TIME = 30; // seconds per word
 const TOTAL_WORDS = 10;
 
+// Normalize a string for comparison: lowercase, strip punctuation/articles, trim
+function normalize(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '') // strip punctuation
+    .replace(/\b(to|a|an|the)\b/g, '') // strip common prefixes
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Levenshtein distance between two strings
+function levenshtein(a, b) {
+  const matrix = Array.from({ length: a.length + 1 }, (_, i) =>
+    Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+  );
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      matrix[i][j] = a[i - 1] === b[j - 1]
+        ? matrix[i - 1][j - 1]
+        : 1 + Math.min(matrix[i - 1][j], matrix[i][j - 1], matrix[i - 1][j - 1]);
+    }
+  }
+  return matrix[a.length][b.length];
+}
+
+// Check if userAnswer is close enough to the correct answer
+function isCloseEnough(userAnswer, correctAnswer) {
+  if (!userAnswer) return false;
+
+  const userNorm = normalize(userAnswer);
+  const correctNorm = normalize(correctAnswer);
+
+  // Exact match after normalization
+  if (userNorm === correctNorm) return true;
+
+  // Handle answers with slashes or " / " (multiple accepted answers)
+  const alternatives = correctAnswer.split(/\s*\/\s*/).map(normalize);
+  if (alternatives.some(alt => alt === userNorm)) return true;
+
+  // Handle parenthetical clarifiers: "Chef (Cook)" accepts "chef" or "cook"
+  const withoutParens = correctAnswer.replace(/\(.*?\)/g, '').trim();
+  const insideParens = (correctAnswer.match(/\((.*?)\)/g) || []).map(p => p.slice(1, -1));
+  const allForms = [withoutParens, ...insideParens].map(normalize);
+  if (allForms.some(form => form === userNorm)) return true;
+
+  // Levenshtein distance: allow 1 typo for words <= 5 chars, 2 for longer
+  const maxDist = correctNorm.length <= 5 ? 1 : 2;
+  if (levenshtein(userNorm, correctNorm) <= maxDist) return true;
+
+  // Also check distance against each alternative/paren form
+  if (alternatives.concat(allForms).some(alt =>
+    levenshtein(userNorm, alt) <= (alt.length <= 5 ? 1 : 2)
+  )) return true;
+
+  return false;
+}
+
 export default function ChallengePage() {
   const { code } = useParams();
   const navigate = useNavigate();
@@ -124,7 +181,7 @@ export default function ChallengePage() {
     if (!currentWord) return;
 
     const userAnswer = answer.trim().toLowerCase();
-    const correct = currentWord.english.toLowerCase() === userAnswer;
+    const correct = isCloseEnough(userAnswer, currentWord.english);
     const newScore = correct ? score + 1 : score;
     const newAnswers = [...answers, {
       word: currentWord.target,
