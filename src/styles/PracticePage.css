@@ -14,25 +14,24 @@
   backdrop-filter: blur(10px);
 }
 
-.practice-header .back-btn {
+.practice-header-left,
+.practice-header-right {
   flex: 1;
   min-width: 0;
-  align-self: center;
+  display: flex;
+}
+
+.practice-header-left {
   justify-content: flex-start;
 }
 
-.practice-title {
-  flex: 1;
-  text-align: center;
+.practice-header-right {
+  justify-content: flex-end;
 }
 
-.practice-header .progress-badge {
-  flex: 1;
-  min-width: 0;
-  text-align: right;
-  align-self: center;
-  display: flex;
-  justify-content: flex-end;
+.practice-title {
+  flex: 0 0 auto;
+  text-align: center;
 }
 
 .back-btn {

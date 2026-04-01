@@ -15,14 +15,23 @@
   backdrop-filter: blur(10px);
 }
 
-.lang-home-header .back-btn {
+.lang-home-header-left,
+.lang-home-header-right {
   flex: 1;
   min-width: 0;
+  display: flex;
+}
+
+.lang-home-header-left {
   justify-content: flex-start;
 }
 
+.lang-home-header-right {
+  justify-content: flex-end;
+}
+
 .lang-home-title {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,13 +43,6 @@
   font-weight: 700;
   margin: 0;
   color: #fff;
-}
-
-.lang-home-header .word-count-badge {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  justify-content: flex-end;
 }
 
 .word-count-badge {

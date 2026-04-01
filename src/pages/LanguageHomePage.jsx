@@ -75,18 +75,22 @@ export default function LanguageHomePage() {
   return (
     <div className="lang-home" style={themeVars}>
       <header className="lang-home-header">
-        <button className="back-btn" onClick={() => navigate('/')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          Globe
-        </button>
+        <div className="lang-home-header-left">
+          <button className="back-btn" onClick={() => navigate('/')}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            Globe
+          </button>
+        </div>
         <div className="lang-home-title">
           <Flag code={flagCode} size="2rem" />
           <h1>{data.languageName}</h1>
         </div>
-        <div className="word-count-badge">{totalWords} words</div>
+        <div className="lang-home-header-right">
+          <div className="word-count-badge">{totalWords} words</div>
+        </div>
       </header>
 
       <div className="lang-home-content">

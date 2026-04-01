@@ -139,20 +139,24 @@ export default function PracticePage() {
     return (
       <div className="practice-page" style={themeVars}>
         <header className="practice-header">
-          <button className="back-btn" onClick={() => navigate(languageHomeUrl)}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            {data.languageName}
-          </button>
+          <div className="practice-header-left">
+            <button className="back-btn" onClick={() => navigate(languageHomeUrl)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5" />
+                <polyline points="12 19 5 12 12 5" />
+              </svg>
+              {data.languageName}
+            </button>
+          </div>
           <div className="practice-title">
             <span className="title-flag"><Flag code={flagCode} size="2rem" /></span>
             <h1>{difficultyLevel || data.nativeName}</h1>
             <span className="practice-subtitle">{data.languageName} - {data.country}</span>
           </div>
-          <div className="progress-badge">
-            {knownCount}/{totalWords} learned
+          <div className="practice-header-right">
+            <div className="progress-badge">
+              {knownCount}/{totalWords} learned
+            </div>
           </div>
         </header>
 
@@ -177,20 +181,24 @@ export default function PracticePage() {
   return (
     <div className="practice-page" style={themeVars}>
       <header className="practice-header">
-        <button className="back-btn" onClick={resetSession}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          Categories
-        </button>
+        <div className="practice-header-left">
+          <button className="back-btn" onClick={resetSession}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            Categories
+          </button>
+        </div>
         <div className="practice-title">
           <span className="title-flag"><Flag code={flagCode} size="2rem" /></span>
           <h1>{selectedCategory}</h1>
           <span className="practice-subtitle">{data.languageName}</span>
         </div>
-        <div className="progress-badge">
-          {currentIndex + 1}/{currentWords.length}
+        <div className="practice-header-right">
+          <div className="progress-badge">
+            {currentIndex + 1}/{currentWords.length}
+          </div>
         </div>
       </header>
 
