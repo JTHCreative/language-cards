@@ -213,23 +213,61 @@
 
 .game-word-card {
   position: relative;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: min(340px, calc(100vw - 48px));
+  min-height: 220px;
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--theme-secondary, #1e1b4b) 30%, #1a1a2e),
+    color-mix(in srgb, var(--theme-primary, #312e81) 20%, #252540));
+  border: 1px solid color-mix(in srgb, var(--theme-accent, #8b5cf6) 30%, transparent);
+  box-shadow: 0 10px 40px color-mix(in srgb, var(--theme-primary, #6366f1) 20%, transparent);
   border-radius: 20px;
-  padding: 32px 48px;
+  padding: 24px;
   text-align: center;
-  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.game-word-label {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+.game-word {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, var(--theme-accent, #fff), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.game-word-pronunciation {
+  color: var(--theme-accent, rgba(255, 255, 255, 0.6));
+  font-size: 0.95rem;
+  font-style: italic;
+  margin: 8px 0 0;
+  opacity: 0.7;
 }
 
 .game-speak-btn {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  background: color-mix(in srgb, var(--theme-primary, #fff) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--theme-accent, #fff) 20%, transparent);
+  top: 12px;
+  right: 12px;
+  background: color-mix(in srgb, var(--theme-primary, #fff) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-accent, #fff) 25%, transparent);
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -239,33 +277,9 @@
 }
 
 .game-speak-btn:hover {
-  background: color-mix(in srgb, var(--theme-primary, #a78bfa) 22%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, #a78bfa) 25%, transparent);
   color: #fff;
   transform: scale(1.1);
-}
-
-.game-word-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: rgba(255, 255, 255, 0.35);
-}
-
-.game-word {
-  font-size: 3rem;
-  font-weight: 800;
-  margin: 12px 0 8px;
-  background: linear-gradient(135deg, var(--theme-accent, #fff), #fff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.game-word-pronunciation {
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.9rem;
-  font-style: italic;
-  margin: 0;
 }
 
 .game-input-area {
@@ -550,34 +564,21 @@
 
   .game-word-card {
     padding: 20px 16px;
-    min-width: auto;
-    width: 100%;
-    border-radius: 16px;
-  }
-
-  .game-word-label {
-    font-size: 0.68rem;
+    min-height: 200px;
+    border-radius: 18px;
   }
 
   .game-word {
-    font-size: 2rem;
-    margin: 8px 0 6px;
+    font-size: 1.8rem;
   }
 
   .game-word-pronunciation {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
   }
 
   .game-speak-btn {
-    width: 38px;
-    height: 38px;
-    top: 10px;
-    right: 10px;
-  }
-
-  .game-speak-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 44px;
+    height: 44px;
   }
 
   .game-input-area {
