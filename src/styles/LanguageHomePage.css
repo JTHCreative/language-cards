@@ -9,16 +9,23 @@
 .lang-home-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 32px;
   border-bottom: 1px solid color-mix(in srgb, var(--theme-primary, #6366f1) 20%, transparent);
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
 }
 
+.lang-home-header .back-btn {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
 .lang-home-title {
+  flex: 1;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
 }
 
@@ -27,6 +34,13 @@
   font-weight: 700;
   margin: 0;
   color: #fff;
+}
+
+.lang-home-header .word-count-badge {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .word-count-badge {

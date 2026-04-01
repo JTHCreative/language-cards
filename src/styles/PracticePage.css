@@ -8,11 +8,31 @@
 .practice-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 16px 32px;
   border-bottom: 1px solid color-mix(in srgb, var(--theme-primary, #6366f1) 20%, transparent);
   background: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+}
+
+.practice-header .back-btn {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+  justify-content: flex-start;
+}
+
+.practice-title {
+  flex: 1;
+  text-align: center;
+}
+
+.practice-header .progress-badge {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  align-self: center;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .back-btn {
@@ -32,10 +52,6 @@
 .back-btn:hover {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
-}
-
-.practice-title {
-  text-align: center;
 }
 
 .title-flag {
