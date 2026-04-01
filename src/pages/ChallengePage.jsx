@@ -170,13 +170,13 @@ export default function ChallengePage() {
             <p className="lobby-hint">They can enter this code on the Language Home page to join</p>
             <div className="lobby-players">
               <div className="lobby-player ready">
-                <span className="player-icon">👤</span>
+                <span className="player-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                 <span>{challenge.host.username}</span>
                 <span className="player-status">Host</span>
               </div>
               <div className="lobby-vs">VS</div>
               <div className="lobby-player waiting-player">
-                <span className="player-icon">❓</span>
+                <span className="player-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
                 <span>Waiting...</span>
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function ChallengePage() {
             <p className="lobby-subtitle">{TOTAL_WORDS} words &middot; {ROUND_TIME}s per word</p>
             <div className="lobby-players">
               <div className={`lobby-player ${challenge.host.confirmed ? 'confirmed' : ''}`}>
-                <span className="player-icon">👤</span>
+                <span className="player-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                 <span>{challenge.host.username}</span>
                 <span className="player-status">
                   {challenge.host.confirmed ? 'Ready!' : 'Not ready'}
@@ -208,7 +208,7 @@ export default function ChallengePage() {
               </div>
               <div className="lobby-vs">VS</div>
               <div className={`lobby-player ${challenge.guest?.confirmed ? 'confirmed' : ''}`}>
-                <span className="player-icon">👤</span>
+                <span className="player-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
                 <span>{challenge.guest?.username}</span>
                 <span className="player-status">
                   {challenge.guest?.confirmed ? 'Ready!' : 'Not ready'}
