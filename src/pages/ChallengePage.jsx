@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../utils/auth';
-import { onChallengeUpdate, confirmParticipation, submitScore } from '../utils/challenge';
+import { onChallengeUpdate, confirmParticipation, submitScore, deleteChallenge } from '../utils/challenge';
 import { getLanguageById } from '../data/languages';
 import { speak, cancelSpeech, loadVoices } from '../utils/speech';
 import Flag from '../components/Flag';
@@ -434,7 +434,10 @@ export default function ChallengePage() {
             </div>
           )}
 
-          <button className="ch-btn ch-btn-primary" onClick={() => navigate(`/language/${challenge.languageId}`)}>
+          <button className="ch-btn ch-btn-primary" onClick={() => {
+            deleteChallenge(code).catch(() => {});
+            navigate(`/language/${challenge.languageId}`);
+          }}>
             Back to Language
           </button>
         </div>
