@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Flashcard from '../components/Flashcard';
 import Flag from '../components/Flag';
@@ -44,8 +44,7 @@ export default function PracticePage() {
   const categories = difficulty
     ? data.categories.filter(c => difficulty.categories.includes(c.name))
     : data.categories;
-  const langCode =
-    data.languageCode === 'yue' ? 'zh-HK' : data.languageCode;
+  const langCode = language.speechLangCode || data.languageCode;
   const flagCode = language.flagCode;
   const theme = language.theme;
   const languageHomeUrl = `/language/${languageId}`;
@@ -101,6 +100,25 @@ export default function PracticePage() {
     setShowResults(false);
     setSessionResults([]);
   };
+
+  // Keyboard shortcuts during flashcard practice
+  useEffect(() => {
+    if (!selectedCategory || showResults) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        handleKnow();
+      } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+        handleDontKnow();
+      } else if (e.key === ' ') {
+        e.preventDefault(); // prevent page scroll
+        // flip card — handled by Flashcard onClick, but we can't access it here
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCategory, showResults, currentIndex, currentWords]);
 
   // Results screen
   if (showResults) {

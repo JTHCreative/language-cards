@@ -6,6 +6,7 @@ const languages = [
     id: 'cantonese',
     data: cantoneseVocabulary,
     flagCode: 'hk',
+    speechLangCode: 'zh-HK',
     theme: { primary: '#dc2626', secondary: '#f59e0b', accent: '#fbbf24', bg1: '#2a0a0a', bg2: '#1a0505' },
     available: true,
   },
