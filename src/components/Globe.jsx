@@ -16,7 +16,7 @@ function latLngToVector3(lat, lng, radius) {
 }
 
 function EarthGlobe() {
-  const texture = useTexture('/textures/earth.jpg');
+  const texture = useTexture(`${import.meta.env.BASE_URL}textures/earth.jpg`);
 
   return (
     <Sphere args={[2, 64, 64]}>
