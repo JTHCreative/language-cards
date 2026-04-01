@@ -59,7 +59,7 @@
 }
 
 .settings-body {
-  padding: 16px 20px 20px;
+  padding: 8px 0;
 }
 
 .settings-loading {
@@ -75,7 +75,7 @@
   padding: 9px 12px;
   border-radius: 8px;
   font-size: 0.82rem;
-  margin-bottom: 14px;
+  margin: 0 16px 8px;
 }
 
 .settings-success {
@@ -85,9 +85,74 @@
   padding: 9px 12px;
   border-radius: 8px;
   font-size: 0.82rem;
-  margin-bottom: 14px;
+  margin: 0 16px 8px;
 }
 
+/* Expandable Sections */
+.settings-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.settings-section:last-of-type {
+  border-bottom: none;
+}
+
+.settings-section-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.settings-section-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.settings-section-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.settings-section-left svg {
+  opacity: 0.6;
+}
+
+.settings-section-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.4;
+}
+
+.settings-section.open .settings-section-chevron {
+  transform: rotate(180deg);
+}
+
+.settings-section-content {
+  padding: 4px 20px 16px;
+  animation: sectionOpen 0.15s ease-out;
+}
+
+@keyframes sectionOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fields */
 .settings-row {
   display: flex;
   gap: 10px;
@@ -143,14 +208,8 @@
   margin-top: 3px;
 }
 
-.settings-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 6px;
-}
-
 .settings-save {
-  flex: 1;
+  width: 100%;
   padding: 10px;
   border: none;
   border-radius: 10px;
@@ -172,8 +231,15 @@
   cursor: not-allowed;
 }
 
+/* Footer */
+.settings-footer {
+  padding: 12px 20px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .settings-logout {
-  padding: 10px 16px;
+  width: 100%;
+  padding: 10px;
   border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 10px;
   background: rgba(239, 68, 68, 0.08);
@@ -209,9 +275,5 @@
     to {
       transform: translateY(0);
     }
-  }
-
-  .settings-actions {
-    flex-direction: column;
   }
 }
