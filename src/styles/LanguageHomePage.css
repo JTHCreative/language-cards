@@ -425,6 +425,11 @@
     margin-top: 32px;
   }
 
+  .faceoff-subtitle {
+    font-size: 0.82rem;
+    margin-bottom: 16px;
+  }
+
   .faceoff-grid {
     grid-template-columns: 1fr;
     gap: 14px;
@@ -432,5 +437,35 @@
 
   .faceoff-card {
     padding: 20px 16px;
+    gap: 10px;
+  }
+
+  .faceoff-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .faceoff-card p {
+    font-size: 0.78rem;
+  }
+
+  .faceoff-card-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .faceoff-card-icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .faceoff-btn {
+    padding: 11px 20px;
+    font-size: 0.85rem;
+  }
+
+  .faceoff-input {
+    padding: 11px 12px;
+    font-size: 0.95rem;
+    letter-spacing: 3px;
   }
 }
