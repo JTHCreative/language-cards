@@ -122,6 +122,20 @@
   margin: 0;
 }
 
+.waiting-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--theme-accent, #a78bfa);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 8px 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Buttons */
 .ch-btn {
   padding: 12px 28px;

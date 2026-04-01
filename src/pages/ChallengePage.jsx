@@ -360,22 +360,38 @@ export default function ChallengePage() {
   // SUBMITTED / FINISHED: Results
   // ============================
   const bothFinished = challenge.status === 'finished';
+
+  // Show waiting screen until both players have submitted
+  if (!bothFinished) {
+    return (
+      <div className="challenge-page" style={themeVars}>
+        <div className="challenge-center">
+          <div className="lobby-card">
+            {flagCode && <Flag code={flagCode} size="2.5rem" />}
+            <h2>You're Done!</h2>
+            <p className="lobby-subtitle">Waiting for your opponent to finish...</p>
+            <div className="waiting-spinner" />
+            <p className="lobby-hint">Results will appear when both players are done</p>
+            <button className="ch-btn ch-btn-ghost" onClick={() => navigate(`/language/${challenge.languageId}`)}>
+              Leave Challenge
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const myScore = myData?.score ?? score;
   const opScore = opponentData?.score;
 
-  let resultMessage = 'Waiting for opponent to finish...';
-  let resultClass = '';
-  if (bothFinished && opScore !== null) {
-    if (myScore > opScore) {
-      resultMessage = 'You Win!';
-      resultClass = 'result-win';
-    } else if (myScore < opScore) {
-      resultMessage = 'You Lose';
-      resultClass = 'result-lose';
-    } else {
-      resultMessage = "It's a Tie!";
-      resultClass = 'result-tie';
-    }
+  let resultMessage = "It's a Tie!";
+  let resultClass = 'result-tie';
+  if (myScore > opScore) {
+    resultMessage = 'You Win!';
+    resultClass = 'result-win';
+  } else if (myScore < opScore) {
+    resultMessage = 'You Lose';
+    resultClass = 'result-lose';
   }
 
   return (
@@ -386,14 +402,14 @@ export default function ChallengePage() {
           <h2 className={`result-heading ${resultClass}`}>{resultMessage}</h2>
 
           <div className="results-scoreboard">
-            <div className={`results-player ${bothFinished && myScore >= opScore ? 'winner' : ''}`}>
+            <div className={`results-player ${myScore >= opScore ? 'winner' : ''}`}>
               <span className="results-player-name">{myData?.username || 'You'}</span>
               <span className="results-player-score">{myScore}</span>
             </div>
             <div className="results-divider">—</div>
-            <div className={`results-player ${bothFinished && opScore > myScore ? 'winner' : ''}`}>
+            <div className={`results-player ${opScore > myScore ? 'winner' : ''}`}>
               <span className="results-player-name">{opponentData?.username || 'Opponent'}</span>
-              <span className="results-player-score">{opScore !== null && opScore !== undefined ? opScore : '...'}</span>
+              <span className="results-player-score">{opScore}</span>
             </div>
           </div>
 
