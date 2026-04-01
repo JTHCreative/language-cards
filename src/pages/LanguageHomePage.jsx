@@ -149,7 +149,8 @@ export default function LanguageHomePage() {
 
         {/* Difficulty Cards */}
         <section className="difficulty-section">
-          <h2 className="section-heading">Choose Your Level</h2>
+          <h2 className="section-heading">Practice</h2>
+          <p className="section-subheading">Choose Your Level</p>
           <div className="difficulty-grid">
             {data.difficulties.map((diff) => {
               const wordCount = diff.categories.reduce((sum, catName) => {

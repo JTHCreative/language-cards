@@ -129,7 +129,14 @@
   font-size: 1.2rem;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.85);
-  margin: 0 0 24px;
+  margin: 0;
+  text-align: center;
+}
+
+.section-subheading {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 6px 0 24px;
   text-align: center;
 }
 
