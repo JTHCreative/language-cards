@@ -102,10 +102,10 @@ export const getUserProfile = async (uid) => {
   }
 };
 
-// Update profile in Firestore
+// Update profile in Firestore (creates doc if it doesn't exist)
 export const updateUserProfile = async (uid, updates) => {
   try {
-    await updateDoc(doc(db, 'users', uid), updates);
+    await setDoc(doc(db, 'users', uid), updates, { merge: true });
     return { success: true };
   } catch (err) {
     return { success: false, error: err.message };
