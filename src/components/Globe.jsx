@@ -30,10 +30,8 @@ function EarthGlobe() {
 
 // Atmospheric glow around the globe
 function Atmosphere() {
-  const meshRef = useRef();
-
   return (
-    <Sphere ref={meshRef} args={[2.06, 64, 64]}>
+    <Sphere args={[2.06, 64, 64]}>
       <meshBasicMaterial
         color="#4488ff"
         transparent
