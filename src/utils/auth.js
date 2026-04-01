@@ -4,6 +4,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  updatePassword,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './firebase';
@@ -11,19 +12,41 @@ import { auth, db } from './firebase';
 // Convert username to a fake email for Firebase Auth (which requires email)
 const toEmail = (username) => `${username.toLowerCase().replace(/\s/g, '')}@languagecards.app`;
 
-export const signup = async (username, password) => {
+export const signup = async (username, password, firstName, lastName, email) => {
   if (!username || username.length < 3) {
     return { success: false, error: 'Username must be at least 3 characters.' };
   }
   if (!password || password.length < 6) {
     return { success: false, error: 'Password must be at least 6 characters.' };
   }
+  if (!firstName || !firstName.trim()) {
+    return { success: false, error: 'First name is required.' };
+  }
 
   try {
-    const email = toEmail(username);
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const authEmail = toEmail(username);
+    const cred = await createUserWithEmailAndPassword(auth, authEmail, password);
     await updateProfile(cred.user, { displayName: username });
-    return { success: true, user: { username, uid: cred.user.uid } };
+
+    // Store profile in Firestore
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      username,
+      firstName: firstName.trim(),
+      lastName: (lastName || '').trim(),
+      email: (email || '').trim(),
+      createdAt: Date.now(),
+    });
+
+    return {
+      success: true,
+      user: {
+        username,
+        uid: cred.user.uid,
+        firstName: firstName.trim(),
+        lastName: (lastName || '').trim(),
+        email: (email || '').trim(),
+      },
+    };
   } catch (err) {
     if (err.code === 'auth/email-already-in-use') {
       return { success: false, error: 'Username already taken.' };
@@ -34,10 +57,23 @@ export const signup = async (username, password) => {
 
 export const login = async (username, password) => {
   try {
-    const email = toEmail(username);
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    const displayName = cred.user.displayName || username;
-    return { success: true, user: { username: displayName, uid: cred.user.uid } };
+    const authEmail = toEmail(username);
+    const cred = await signInWithEmailAndPassword(auth, authEmail, password);
+
+    // Fetch profile from Firestore
+    const profile = await getUserProfile(cred.user.uid);
+    const displayName = profile?.username || cred.user.displayName || username;
+
+    return {
+      success: true,
+      user: {
+        username: displayName,
+        uid: cred.user.uid,
+        firstName: profile?.firstName || '',
+        lastName: profile?.lastName || '',
+        email: profile?.email || '',
+      },
+    };
   } catch (err) {
     if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
       return { success: false, error: 'Invalid username or password.' };
@@ -56,11 +92,54 @@ export const getCurrentUser = () => {
   return { username: user.displayName || user.email, uid: user.uid };
 };
 
+// Get full profile from Firestore
+export const getUserProfile = async (uid) => {
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? snap.data() : null;
+  } catch {
+    return null;
+  }
+};
+
+// Update profile in Firestore
+export const updateUserProfile = async (uid, updates) => {
+  try {
+    await updateDoc(doc(db, 'users', uid), updates);
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+};
+
+// Update password
+export const updateUserPassword = async (newPassword) => {
+  try {
+    if (!newPassword || newPassword.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters.' };
+    }
+    await updatePassword(auth.currentUser, newPassword);
+    return { success: true };
+  } catch (err) {
+    if (err.code === 'auth/requires-recent-login') {
+      return { success: false, error: 'Please log out and log back in before changing your password.' };
+    }
+    return { success: false, error: err.message };
+  }
+};
+
 // Listen for auth state changes (returns unsubscribe function)
 export const onAuthChange = (callback) => {
-  return onAuthStateChanged(auth, (user) => {
+  return onAuthStateChanged(auth, async (user) => {
     if (user) {
-      callback({ username: user.displayName || user.email, uid: user.uid });
+      const profile = await getUserProfile(user.uid);
+      callback({
+        username: profile?.username || user.displayName || user.email,
+        uid: user.uid,
+        firstName: profile?.firstName || '',
+        lastName: profile?.lastName || '',
+        email: profile?.email || '',
+      });
     } else {
       callback(null);
     }

@@ -1,11 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import Globe from '../components/Globe';
-import { getCurrentUser } from '../utils/auth';
+import ProfileButton from '../components/ProfileButton';
 import '../styles/GlobePage.css';
 
-export default function GlobePage({ onLogout }) {
+export default function GlobePage({ user, onLogout }) {
   const navigate = useNavigate();
-  const user = getCurrentUser();
 
   const handleSelectLanguage = (language) => {
     navigate(`/language/${language.id}`);
@@ -18,10 +17,7 @@ export default function GlobePage({ onLogout }) {
           <h1>Language Cards</h1>
         </div>
         <div className="header-right">
-          <span className="username">Hi, {user?.username}</span>
-          <button className="logout-btn" onClick={onLogout}>
-            Log Out
-          </button>
+          <ProfileButton user={user} onLogout={onLogout} />
         </div>
       </header>
 

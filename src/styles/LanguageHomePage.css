@@ -20,14 +20,13 @@
   flex: 1;
   min-width: 0;
   display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
 }
 
 .lang-home-header-left {
   justify-content: flex-start;
-}
-
-.lang-home-header-right {
-  justify-content: flex-end;
 }
 
 .lang-home-title {
