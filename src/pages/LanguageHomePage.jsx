@@ -92,9 +92,6 @@ export default function LanguageHomePage() {
       <div className="lang-home-content">
         {/* Language Introduction */}
         <section className="lang-intro">
-          <div className="lang-intro-flag">
-            <Flag code={flagCode} size="4rem" />
-          </div>
           <div className="lang-intro-text">
             <h2>
               <span className="lang-native">{data.nativeName}</span>

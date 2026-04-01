@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useMemo, useState, useRef, useCallback } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Html, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllLanguages } from '../data/languages';
@@ -165,7 +165,7 @@ function Atmosphere() {
   );
 }
 
-function LanguageFlag({ language, onClick }) {
+function LanguageFlag({ language, onClick, zoomScale = 1 }) {
   const [hovered, setHovered] = useState(false);
   const coords = language.data?.coordinates || language.coordinates;
   const name = language.data?.languageName || language.languageName;
@@ -177,6 +177,9 @@ function LanguageFlag({ language, onClick }) {
     () => latLngToVector3(coords.lat, coords.lng, 2.08),
     [coords]
   );
+
+  const baseSize = Math.round(22 * zoomScale);
+  const hoverSize = Math.round(28 * zoomScale);
 
   return (
     <group position={position}>
@@ -201,7 +204,7 @@ function LanguageFlag({ language, onClick }) {
               transform: hovered ? 'translateY(-4px) scale(1.3)' : 'none',
             }}
           >
-            <Flag code={flagCode} size={hovered ? '28px' : '22px'} />
+            <Flag code={flagCode} size={`${hovered ? hoverSize : baseSize}px`} />
           </div>
 
           {/* Tooltip on hover */}
@@ -238,8 +241,26 @@ function LanguageFlag({ language, onClick }) {
   );
 }
 
+// Track camera distance and map to a zoom scale (1.0 at max distance, 1.5 at min distance)
+function useZoomScale(minDist = 3, maxDist = 8) {
+  const [scale, setScale] = useState(1);
+  const { camera } = useThree();
+
+  useFrame(() => {
+    const dist = camera.position.length();
+    // Clamp and map: maxDist -> 1.0, minDist -> 1.5
+    const t = 1 - (Math.min(Math.max(dist, minDist), maxDist) - minDist) / (maxDist - minDist);
+    const newScale = 1 + t * 0.5;
+    // Only update if changed meaningfully to avoid excessive re-renders
+    setScale(prev => Math.abs(prev - newScale) > 0.02 ? newScale : prev);
+  });
+
+  return scale;
+}
+
 function GlobeScene({ onSelectLanguage }) {
   const languages = getAllLanguages();
+  const zoomScale = useZoomScale(3, 8);
 
   return (
     <>
@@ -257,6 +278,7 @@ function GlobeScene({ onSelectLanguage }) {
           key={lang.id}
           language={lang}
           onClick={onSelectLanguage}
+          zoomScale={zoomScale}
         />
       ))}
 
