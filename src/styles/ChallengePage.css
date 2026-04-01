@@ -209,12 +209,36 @@
 }
 
 .game-word-card {
+  position: relative;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 32px 48px;
   text-align: center;
   min-width: 280px;
+}
+
+.game-speak-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: color-mix(in srgb, var(--theme-primary, #fff) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-accent, #fff) 20%, transparent);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--theme-accent, #a78bfa);
+  transition: all 0.2s;
+}
+
+.game-speak-btn:hover {
+  background: color-mix(in srgb, var(--theme-primary, #a78bfa) 22%, transparent);
+  color: #fff;
+  transform: scale(1.1);
 }
 
 .game-word-label {
