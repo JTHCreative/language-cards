@@ -3,6 +3,7 @@
 // Cache voices once loaded
 let cachedVoices = [];
 let voicesLoaded = false;
+let activeResumeInterval = null;
 
 // Preload voices (must be called early — some browsers load async)
 export const loadVoices = () => {
@@ -45,7 +46,6 @@ export const loadVoices = () => {
 
 export const speak = async (text, langCode = 'zh-HK') => {
   if (!('speechSynthesis' in window)) {
-    console.warn('Speech synthesis not supported');
     return;
   }
 
@@ -54,8 +54,8 @@ export const speak = async (text, langCode = 'zh-HK') => {
     await loadVoices();
   }
 
-  // Cancel any ongoing speech
-  window.speechSynthesis.cancel();
+  // Cancel any ongoing speech and clear previous interval
+  cancelSpeech();
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = langCode;
@@ -72,15 +72,14 @@ export const speak = async (text, langCode = 'zh-HK') => {
     utterance.lang = voice.lang;
   }
 
-  // iOS Safari requires a user gesture to start speech.
-  // Calling .speak() directly from a click handler satisfies this.
   window.speechSynthesis.speak(utterance);
 
   // iOS Safari bug: speech can pause after ~15s. Resume workaround.
   if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-    const resumeInterval = setInterval(() => {
+    activeResumeInterval = setInterval(() => {
       if (!window.speechSynthesis.speaking) {
-        clearInterval(resumeInterval);
+        clearInterval(activeResumeInterval);
+        activeResumeInterval = null;
       } else {
         window.speechSynthesis.pause();
         window.speechSynthesis.resume();
@@ -89,48 +88,48 @@ export const speak = async (text, langCode = 'zh-HK') => {
   }
 };
 
+export const cancelSpeech = () => {
+  if (activeResumeInterval) {
+    clearInterval(activeResumeInterval);
+    activeResumeInterval = null;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+};
+
 function findBestVoice(voices, langCode) {
   if (!voices.length) return null;
 
   // For Cantonese (zh-HK), be very specific to avoid Mandarin voices
   if (langCode === 'zh-HK') {
-    // 1. Exact zh-HK match
-    const exactHK = voices.find(v => v.lang === 'zh-HK');
-    if (exactHK) return exactHK;
+    const exact = voices.find(v => v.lang === 'zh-HK');
+    if (exact) return exact;
 
-    // 2. Match zh_HK (underscore variant used by some browsers)
-    const underscoreHK = voices.find(v => v.lang === 'zh_HK');
-    if (underscoreHK) return underscoreHK;
+    const underscore = voices.find(v => v.lang === 'zh_HK');
+    if (underscore) return underscore;
 
-    // 3. Look for voices with "Cantonese" or "HK" or "Hong Kong" in the name
-    const cantoneseNamed = voices.find(v =>
+    const named = voices.find(v =>
       /cantonese|hong\s*kong|\bhk\b|sinji/i.test(v.name) ||
       /cantonese|hong\s*kong|\bhk\b/i.test(v.lang)
     );
-    if (cantoneseNamed) return cantoneseNamed;
+    if (named) return named;
 
-    // 4. Try yue (ISO 639-3 for Cantonese, used by some systems)
     const yue = voices.find(v => v.lang.startsWith('yue'));
     if (yue) return yue;
 
-    // 5. zh-Hant-HK (traditional Chinese HK)
     const hantHK = voices.find(v => v.lang.includes('Hant') && v.lang.includes('HK'));
     if (hantHK) return hantHK;
 
-    // 6. Last resort: any zh-HK starting match
     const anyHK = voices.find(v => v.lang.startsWith('zh-HK') || v.lang.startsWith('zh_HK'));
     if (anyHK) return anyHK;
 
-    // Do NOT fall back to generic zh (which is usually Mandarin)
+    // Do NOT fall back to generic zh (usually Mandarin)
     return null;
   }
 
-  // For other languages, do simple matching
   const exact = voices.find(v => v.lang === langCode);
   if (exact) return exact;
 
-  const prefix = voices.find(v => v.lang.startsWith(langCode));
-  if (prefix) return prefix;
-
-  return null;
+  return voices.find(v => v.lang.startsWith(langCode)) || null;
 }

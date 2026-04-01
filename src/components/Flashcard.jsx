@@ -1,10 +1,15 @@
-import { useState } from 'react';
-import { speak } from '../utils/speech';
+import { useState, useEffect } from 'react';
+import { speak, cancelSpeech } from '../utils/speech';
 import Flag from './Flag';
 import '../styles/Flashcard.css';
 
 export default function Flashcard({ word, languageCode, flagCode }) {
   const [flipped, setFlipped] = useState(false);
+
+  // Cancel speech when component unmounts or word changes
+  useEffect(() => {
+    return () => cancelSpeech();
+  }, [word]);
 
   const handleSpeak = (e) => {
     e.stopPropagation();
@@ -39,6 +44,7 @@ export default function Flashcard({ word, languageCode, flagCode }) {
           <button
             className="speak-btn"
             onClick={handleSpeak}
+            aria-label="Listen to pronunciation"
             title="Listen to pronunciation"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
