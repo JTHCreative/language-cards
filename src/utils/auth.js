@@ -1,62 +1,97 @@
-// Simple localStorage-based authentication
-const AUTH_KEY = 'language_cards_user';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
 
-export const login = (username, password) => {
-  const users = JSON.parse(localStorage.getItem('language_cards_users') || '{}');
-  const user = users[username];
+// Convert username to a fake email for Firebase Auth (which requires email)
+const toEmail = (username) => `${username.toLowerCase().replace(/\s/g, '')}@languagecards.app`;
 
-  if (!user) {
-    return { success: false, error: 'User not found. Please sign up first.' };
-  }
-
-  if (user.password !== password) {
-    return { success: false, error: 'Incorrect password.' };
-  }
-
-  const session = { username, loggedInAt: Date.now() };
-  localStorage.setItem(AUTH_KEY, JSON.stringify(session));
-  return { success: true, user: session };
-};
-
-export const signup = (username, password) => {
+export const signup = async (username, password) => {
   if (!username || username.length < 3) {
     return { success: false, error: 'Username must be at least 3 characters.' };
   }
-  if (!password || password.length < 4) {
-    return { success: false, error: 'Password must be at least 4 characters.' };
+  if (!password || password.length < 6) {
+    return { success: false, error: 'Password must be at least 6 characters.' };
   }
 
-  const users = JSON.parse(localStorage.getItem('language_cards_users') || '{}');
-
-  if (users[username]) {
-    return { success: false, error: 'Username already taken.' };
+  try {
+    const email = toEmail(username);
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(cred.user, { displayName: username });
+    return { success: true, user: { username, uid: cred.user.uid } };
+  } catch (err) {
+    if (err.code === 'auth/email-already-in-use') {
+      return { success: false, error: 'Username already taken.' };
+    }
+    return { success: false, error: err.message };
   }
-
-  users[username] = { password, createdAt: Date.now() };
-  localStorage.setItem('language_cards_users', JSON.stringify(users));
-
-  const session = { username, loggedInAt: Date.now() };
-  localStorage.setItem(AUTH_KEY, JSON.stringify(session));
-  return { success: true, user: session };
 };
 
-export const logout = () => {
-  localStorage.removeItem(AUTH_KEY);
+export const login = async (username, password) => {
+  try {
+    const email = toEmail(username);
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const displayName = cred.user.displayName || username;
+    return { success: true, user: { username: displayName, uid: cred.user.uid } };
+  } catch (err) {
+    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+      return { success: false, error: 'Invalid username or password.' };
+    }
+    return { success: false, error: err.message };
+  }
+};
+
+export const logout = async () => {
+  await signOut(auth);
 };
 
 export const getCurrentUser = () => {
-  const session = localStorage.getItem(AUTH_KEY);
-  return session ? JSON.parse(session) : null;
+  const user = auth.currentUser;
+  if (!user) return null;
+  return { username: user.displayName || user.email, uid: user.uid };
 };
 
-export const getProgress = (username, languageId) => {
-  const key = `progress_${username}_${languageId}`;
-  return JSON.parse(localStorage.getItem(key) || '{}');
+// Listen for auth state changes (returns unsubscribe function)
+export const onAuthChange = (callback) => {
+  return onAuthStateChanged(auth, (user) => {
+    if (user) {
+      callback({ username: user.displayName || user.email, uid: user.uid });
+    } else {
+      callback(null);
+    }
+  });
 };
 
-export const saveProgress = (username, languageId, wordIndex, known) => {
-  const key = `progress_${username}_${languageId}`;
-  const progress = JSON.parse(localStorage.getItem(key) || '{}');
-  progress[wordIndex] = { known, lastReviewed: Date.now() };
-  localStorage.setItem(key, JSON.stringify(progress));
+// Progress stored in Firestore: users/{uid}/progress/{languageId}
+export const getProgress = async (uid, languageId) => {
+  try {
+    const ref = doc(db, 'users', uid, 'progress', languageId);
+    const snap = await getDoc(ref);
+    return snap.exists() ? snap.data() : {};
+  } catch {
+    return {};
+  }
+};
+
+export const saveProgress = async (uid, languageId, wordKey, known) => {
+  try {
+    const ref = doc(db, 'users', uid, 'progress', languageId);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      await updateDoc(ref, {
+        [wordKey]: { known, lastReviewed: Date.now() },
+      });
+    } else {
+      await setDoc(ref, {
+        [wordKey]: { known, lastReviewed: Date.now() },
+      });
+    }
+  } catch (err) {
+    console.error('Failed to save progress:', err);
+  }
 };

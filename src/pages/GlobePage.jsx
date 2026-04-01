@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import Globe from '../components/Globe';
-import { logout, getCurrentUser } from '../utils/auth';
+import { getCurrentUser } from '../utils/auth';
 import '../styles/GlobePage.css';
 
 export default function GlobePage({ onLogout }) {
@@ -11,11 +11,6 @@ export default function GlobePage({ onLogout }) {
     navigate(`/language/${language.id}`);
   };
 
-  const handleLogout = () => {
-    logout();
-    onLogout();
-  };
-
   return (
     <div className="globe-page">
       <header className="globe-header">
@@ -24,7 +19,7 @@ export default function GlobePage({ onLogout }) {
         </div>
         <div className="header-right">
           <span className="username">Hi, {user?.username}</span>
-          <button className="logout-btn" onClick={handleLogout}>
+          <button className="logout-btn" onClick={onLogout}>
             Log Out
           </button>
         </div>

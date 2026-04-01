@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { getCurrentUser } from './utils/auth';
+import { onAuthChange, logout } from './utils/auth';
 import LoginPage from './pages/LoginPage';
 import GlobePage from './pages/GlobePage';
 import LanguageHomePage from './pages/LanguageHomePage';
@@ -8,15 +8,41 @@ import PracticePage from './pages/PracticePage';
 import './App.css';
 
 function App() {
-  const [user, setUser] = useState(() => getCurrentUser());
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthChange((firebaseUser) => {
+      setUser(firebaseUser);
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, []);
 
   const handleLogin = (userData) => {
     setUser(userData);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logout();
     setUser(null);
   };
+
+  if (loading) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#0a0a1a',
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: '1rem',
+      }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <HashRouter>
