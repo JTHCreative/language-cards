@@ -1,8 +1,57 @@
 // Text-to-speech utility using Web Speech API
-export const speak = (text, langCode = 'zh-HK') => {
+
+// Cache voices once loaded
+let cachedVoices = [];
+let voicesLoaded = false;
+
+// Preload voices (must be called early — some browsers load async)
+export const loadVoices = () => {
+  return new Promise((resolve) => {
+    if (!('speechSynthesis' in window)) {
+      resolve([]);
+      return;
+    }
+
+    const load = () => {
+      cachedVoices = window.speechSynthesis.getVoices();
+      if (cachedVoices.length > 0) {
+        voicesLoaded = true;
+        resolve(cachedVoices);
+      }
+    };
+
+    load();
+
+    if (!voicesLoaded) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        load();
+        resolve(cachedVoices);
+      };
+
+      // iOS Safari fallback: poll a few times since onvoiceschanged
+      // doesn't always fire reliably
+      let attempts = 0;
+      const poll = setInterval(() => {
+        attempts++;
+        load();
+        if (voicesLoaded || attempts > 10) {
+          clearInterval(poll);
+          resolve(cachedVoices);
+        }
+      }, 200);
+    }
+  });
+};
+
+export const speak = async (text, langCode = 'zh-HK') => {
   if (!('speechSynthesis' in window)) {
     console.warn('Speech synthesis not supported');
     return;
+  }
+
+  // Ensure voices are loaded before speaking
+  if (!voicesLoaded) {
+    await loadVoices();
   }
 
   // Cancel any ongoing speech
@@ -10,18 +59,34 @@ export const speak = (text, langCode = 'zh-HK') => {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = langCode;
-  utterance.rate = 0.8; // Slightly slower for learning
+  utterance.rate = 0.8;
   utterance.pitch = 1;
 
-  // Find the best matching voice, prioritizing exact Cantonese matches
-  const voices = window.speechSynthesis.getVoices();
+  // Find the best matching voice
+  const voices = cachedVoices.length > 0
+    ? cachedVoices
+    : window.speechSynthesis.getVoices();
   const voice = findBestVoice(voices, langCode);
   if (voice) {
     utterance.voice = voice;
-    utterance.lang = voice.lang; // Ensure lang matches the selected voice
+    utterance.lang = voice.lang;
   }
 
+  // iOS Safari requires a user gesture to start speech.
+  // Calling .speak() directly from a click handler satisfies this.
   window.speechSynthesis.speak(utterance);
+
+  // iOS Safari bug: speech can pause after ~15s. Resume workaround.
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+    const resumeInterval = setInterval(() => {
+      if (!window.speechSynthesis.speaking) {
+        clearInterval(resumeInterval);
+      } else {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
+    }, 5000);
+  }
 };
 
 function findBestVoice(voices, langCode) {
@@ -39,7 +104,7 @@ function findBestVoice(voices, langCode) {
 
     // 3. Look for voices with "Cantonese" or "HK" or "Hong Kong" in the name
     const cantoneseNamed = voices.find(v =>
-      /cantonese|hong\s*kong|\bhk\b/i.test(v.name) ||
+      /cantonese|hong\s*kong|\bhk\b|sinji/i.test(v.name) ||
       /cantonese|hong\s*kong|\bhk\b/i.test(v.lang)
     );
     if (cantoneseNamed) return cantoneseNamed;
@@ -69,17 +134,3 @@ function findBestVoice(voices, langCode) {
 
   return null;
 }
-
-// Preload voices (some browsers need this)
-export const loadVoices = () => {
-  return new Promise((resolve) => {
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) {
-      resolve(voices);
-    } else {
-      window.speechSynthesis.onvoiceschanged = () => {
-        resolve(window.speechSynthesis.getVoices());
-      };
-    }
-  });
-};
