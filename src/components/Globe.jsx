@@ -29,13 +29,125 @@ function EarthGlobe() {
   );
 }
 
-// Milky Way / starfield skybox
+// Procedural starfield - thousands of star particles
 function Starfield() {
-  const texture = useTexture('/textures/starfield.jpg');
+  const starPositions = useMemo(() => {
+    const positions = new Float32Array(8000 * 3);
+    const colors = new Float32Array(8000 * 3);
+    const sizes = new Float32Array(8000);
+
+    for (let i = 0; i < 8000; i++) {
+      // Random position on a large sphere shell
+      const radius = 40 + Math.random() * 20;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+
+      // Slight color variation: white, blue-white, warm-white
+      const temp = Math.random();
+      if (temp < 0.15) {
+        // Blue-ish stars
+        colors[i * 3] = 0.7;
+        colors[i * 3 + 1] = 0.8;
+        colors[i * 3 + 2] = 1.0;
+      } else if (temp < 0.25) {
+        // Warm/yellow stars
+        colors[i * 3] = 1.0;
+        colors[i * 3 + 1] = 0.95;
+        colors[i * 3 + 2] = 0.8;
+      } else {
+        // White stars
+        colors[i * 3] = 1.0;
+        colors[i * 3 + 1] = 1.0;
+        colors[i * 3 + 2] = 1.0;
+      }
+
+      sizes[i] = 0.3 + Math.random() * 1.2;
+    }
+
+    return { positions, colors, sizes };
+  }, []);
+
+  // Milky Way band - denser cluster of dimmer stars along a plane
+  const milkyWayPositions = useMemo(() => {
+    const positions = new Float32Array(4000 * 3);
+    const colors = new Float32Array(4000 * 3);
+
+    for (let i = 0; i < 4000; i++) {
+      const radius = 38 + Math.random() * 24;
+      const theta = Math.random() * Math.PI * 2;
+      // Concentrate near a plane (small phi deviation) for milky way band
+      const phi = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+
+      // Dimmer, slightly blue/purple tint
+      const brightness = 0.3 + Math.random() * 0.4;
+      colors[i * 3] = brightness * 0.9;
+      colors[i * 3 + 1] = brightness * 0.85;
+      colors[i * 3 + 2] = brightness * 1.1;
+    }
+
+    return { positions, colors };
+  }, []);
+
   return (
-    <Sphere args={[50, 64, 64]}>
-      <meshBasicMaterial map={texture} side={THREE.BackSide} />
-    </Sphere>
+    <group>
+      {/* Main stars */}
+      <points>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={8000}
+            array={starPositions.positions}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            count={8000}
+            array={starPositions.colors}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.15}
+          vertexColors
+          transparent
+          opacity={0.9}
+          sizeAttenuation
+        />
+      </points>
+
+      {/* Milky Way band */}
+      <points>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={4000}
+            array={milkyWayPositions.positions}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            count={4000}
+            array={milkyWayPositions.colors}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.08}
+          vertexColors
+          transparent
+          opacity={0.6}
+          sizeAttenuation
+        />
+      </points>
+    </group>
   );
 }
 
@@ -167,7 +279,7 @@ export default function Globe({ onSelectLanguage }) {
     <div style={{ width: '100%', height: '100%' }}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ background: 'transparent' }}
+        style={{ background: '#000005' }}
       >
         <GlobeScene onSelectLanguage={onSelectLanguage} />
       </Canvas>
