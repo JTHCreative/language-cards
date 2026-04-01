@@ -1,3 +1,7 @@
+.profile-container {
+  position: relative;
+}
+
 .profile-btn {
   display: flex;
   align-items: center;
