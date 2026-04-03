@@ -65,15 +65,15 @@ function generateSpaceTexture(width = 2048, height = 1024) {
   });
 
   // Wispy cloud layers using noise-like random passes
-  for (let pass = 0; pass < 3; pass++) {
-    for (let i = 0; i < 600; i++) {
+  for (let pass = 0; pass < 4; pass++) {
+    for (let i = 0; i < 800; i++) {
       const x = Math.random() * width;
       const y = Math.random() * height;
-      const r = 20 + Math.random() * 80;
+      const r = 15 + Math.random() * 100;
       const hue = Math.random() < 0.5 ? 220 + Math.random() * 40 : 10 + Math.random() * 30;
       const sat = 40 + Math.random() * 40;
       const light = 30 + Math.random() * 30;
-      const alpha = 0.01 + Math.random() * 0.03;
+      const alpha = 0.01 + Math.random() * 0.04;
       const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
       grd.addColorStop(0, `hsla(${hue},${sat}%,${light}%,${alpha})`);
       grd.addColorStop(1, 'transparent');
@@ -82,30 +82,8 @@ function generateSpaceTexture(width = 2048, height = 1024) {
     }
   }
 
-  // Bright star points
-  for (let i = 0; i < 1500; i++) {
-    const x = Math.random() * width;
-    const y = Math.random() * height;
-    const size = Math.random() < 0.05 ? 1.5 + Math.random() * 1.5 : 0.5 + Math.random() * 0.8;
-    const brightness = 0.4 + Math.random() * 0.6;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
-    ctx.fill();
-  }
-
-  // Bright prominent stars with glow
-  for (let i = 0; i < 30; i++) {
-    const x = Math.random() * width;
-    const y = Math.random() * height;
-    const glow = ctx.createRadialGradient(x, y, 0, x, y, 8 + Math.random() * 12);
-    const hue = Math.random() < 0.5 ? 200 + Math.random() * 40 : 30 + Math.random() * 20;
-    glow.addColorStop(0, `hsla(${hue},60%,90%,0.8)`);
-    glow.addColorStop(0.3, `hsla(${hue},60%,70%,0.2)`);
-    glow.addColorStop(1, 'transparent');
-    ctx.fillStyle = glow;
-    ctx.fillRect(x - 20, y - 20, 40, 40);
-  }
+  // No stars baked into the texture — they are rendered as 3D particles instead
+  // to avoid stretching at the poles of the skybox sphere
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
@@ -143,12 +121,12 @@ function Starfield() {
 
   return (
     <group>
-      {/* Nebula skybox sphere */}
-      <Sphere args={[50, 64, 64]}>
+      {/* Nebula skybox sphere — high segment count to avoid visible grid */}
+      <Sphere args={[50, 128, 64]}>
         <meshBasicMaterial map={spaceTexture} side={THREE.BackSide} />
       </Sphere>
 
-      {/* 3D star particles on top */}
+      {/* 3D star particles — rendered separately to avoid texture stretching */}
       <points>
         <bufferGeometry>
           <bufferAttribute
@@ -165,10 +143,10 @@ function Starfield() {
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.12}
+          size={0.06}
           vertexColors
           transparent
-          opacity={0.85}
+          opacity={0.9}
           sizeAttenuation
         />
       </points>
