@@ -119,14 +119,15 @@ function generateSpaceTexture(width = 2048, height = 1024) {
   return texture;
 }
 
-// Space skybox — nebula texture only, no 3D particle stars
+// Space skybox — cube geometry eliminates sphere grid artifacts
 function Starfield() {
   const spaceTexture = useMemo(() => generateSpaceTexture(), []);
 
   return (
-    <Sphere args={[50, 128, 128]}>
+    <mesh>
+      <boxGeometry args={[100, 100, 100]} />
       <meshBasicMaterial map={spaceTexture} side={THREE.BackSide} />
-    </Sphere>
+    </mesh>
   );
 }
 
