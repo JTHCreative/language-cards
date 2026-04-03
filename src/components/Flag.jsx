@@ -8,17 +8,22 @@ export default function Flag({ code, size = '1.5em', className = '', style = {} 
   if (!code) return null;
 
   if (customFlags[code]) {
+    // Render custom flags as a span matching flag-icons sizing exactly
     return (
-      <img
-        src={`${import.meta.env.BASE_URL}flags/${code}.svg`}
-        alt={code}
+      <span
         className={className}
         style={{
-          height: size,
-          width: 'auto',
-          borderRadius: '2px',
           display: 'inline-block',
-          verticalAlign: 'middle',
+          position: 'relative',
+          fontSize: size,
+          width: '1.333333em',
+          lineHeight: '1em',
+          height: '1em',
+          backgroundSize: 'contain',
+          backgroundPosition: '50%',
+          backgroundRepeat: 'no-repeat',
+          backgroundImage: `url(${import.meta.env.BASE_URL}flags/${code}.svg)`,
+          borderRadius: '3px',
           ...style,
         }}
       />
