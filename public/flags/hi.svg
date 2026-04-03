@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 300">
+  <!-- 8 horizontal stripes: white, red, blue alternating -->
+  <rect width="600" height="300" fill="#fff"/>
+  <rect y="37.5" width="600" height="37.5" fill="#BE0028"/>
+  <rect y="112.5" width="600" height="37.5" fill="#002868"/>
+  <rect y="187.5" width="600" height="37.5" fill="#BE0028"/>
+  <rect y="262.5" width="600" height="37.5" fill="#002868"/>
+  <rect y="0" width="600" height="37.5" fill="#fff"/>
+  <rect y="75" width="600" height="37.5" fill="#fff"/>
+  <rect y="150" width="600" height="37.5" fill="#fff"/>
+  <rect y="225" width="600" height="37.5" fill="#fff"/>
+  <!-- Corrected stripes top to bottom: W R W B W R W B -->
+  <rect y="0" width="600" height="37.5" fill="#fff"/>
+  <rect y="37.5" width="600" height="37.5" fill="#BE0028"/>
+  <rect y="75" width="600" height="37.5" fill="#fff"/>
+  <rect y="112.5" width="600" height="37.5" fill="#002868"/>
+  <rect y="150" width="600" height="37.5" fill="#fff"/>
+  <rect y="187.5" width="600" height="37.5" fill="#BE0028"/>
+  <rect y="225" width="600" height="37.5" fill="#fff"/>
+  <rect y="262.5" width="600" height="37.5" fill="#002868"/>
+  <!-- Union Jack canton -->
+  <rect width="240" height="150" fill="#002868"/>
+  <!-- White diagonal cross -->
+  <polygon points="0,0 96,75 0,75" fill="#fff"/>
+  <polygon points="0,150 96,75 0,75" fill="#fff"/>
+  <polygon points="240,0 144,75 240,75" fill="#fff"/>
+  <polygon points="240,150 144,75 240,75" fill="#fff"/>
+  <polygon points="0,0 80,0 240,120 240,150 160,150 0,30" fill="#fff"/>
+  <polygon points="240,0 160,0 0,120 0,150 80,150 240,30" fill="#fff"/>
+  <!-- Red diagonal cross -->
+  <polygon points="0,0 40,0 240,130 240,150 200,150 0,20" fill="#BE0028"/>
+  <polygon points="240,0 200,0 0,130 0,150 40,150 240,20" fill="#BE0028"/>
+  <!-- White cross -->
+  <rect x="100" width="40" height="150" fill="#fff"/>
+  <rect y="55" width="240" height="40" fill="#fff"/>
+  <!-- Red cross -->
+  <rect x="108" width="24" height="150" fill="#BE0028"/>
+  <rect y="63" width="240" height="24" fill="#BE0028"/>
+</svg>

@@ -155,7 +155,7 @@ const languages = [
     nativeName: '\u02BBOlelo Hawai\u02BBi',
     country: 'Hawaii',
     countryCode: 'US',
-    flagCode: 'us',
+    flagCode: 'hi',
     theme: { primary: '#2563eb', secondary: '#dc2626', accent: '#93c5fd', bg1: '#0a1028', bg2: '#050a1a' },
     coordinates: { lat: 20.7984, lng: -156.3319 },
     available: false,
