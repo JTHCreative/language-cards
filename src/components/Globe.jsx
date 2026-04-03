@@ -366,7 +366,44 @@ function Sun() {
   );
 }
 
-function GlobeScene({ onSelectLanguage }) {
+// Smoothly rotate camera to face a target position on the globe
+function CameraAnimator({ targetPosition }) {
+  const { camera } = useThree();
+  const animating = useRef(false);
+  const targetRef = useRef(null);
+
+  useFrame(() => {
+    if (!targetRef.current || !animating.current) return;
+
+    const target = targetRef.current;
+    const currentPos = camera.position.clone().normalize();
+    const targetDir = target.clone().normalize();
+
+    // Spherical interpolation
+    const dot = currentPos.dot(targetDir);
+    if (dot > 0.999) {
+      animating.current = false;
+      return;
+    }
+
+    const newDir = currentPos.lerp(targetDir, 0.04).normalize();
+    const dist = camera.position.length();
+    camera.position.copy(newDir.multiplyScalar(dist));
+    camera.lookAt(0, 0, 0);
+  });
+
+  // React to new target
+  useMemo(() => {
+    if (targetPosition) {
+      targetRef.current = new THREE.Vector3(...targetPosition);
+      animating.current = true;
+    }
+  }, [targetPosition]);
+
+  return null;
+}
+
+function GlobeScene({ onSelectLanguage, flyToPosition }) {
   const languages = getAllLanguages();
   const zoomScale = useZoomScale(3, 8);
 
@@ -376,6 +413,7 @@ function GlobeScene({ onSelectLanguage }) {
       <directionalLight position={SUN_POS} intensity={1.8} />
       <directionalLight position={[-5, -2, -5]} intensity={0.3} />
 
+      <CameraAnimator targetPosition={flyToPosition} />
       <SpaceEnvironment />
       <Sun />
       <EarthGlobe />
@@ -405,13 +443,105 @@ function GlobeScene({ onSelectLanguage }) {
 }
 
 export default function Globe({ onSelectLanguage }) {
+  const [flyToPosition, setFlyToPosition] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const languages = getAllLanguages();
+  const dropdownRef = useRef(null);
+
+  const handleLanguageSelect = (lang) => {
+    const coords = lang.data?.coordinates || lang.coordinates;
+    if (coords) {
+      const pos = latLngToVector3(coords.lat, coords.lng, 5);
+      setFlyToPosition([pos.x, pos.y, pos.z]);
+    }
+    setDropdownOpen(false);
+  };
+
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {/* Language selector */}
+      <div ref={dropdownRef} style={{
+        position: 'absolute', top: 16, left: 16, zIndex: 10,
+      }}>
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 14px',
+            background: 'rgba(28,42,53,0.85)',
+            border: '1px solid rgba(126,200,200,0.2)',
+            borderRadius: 10,
+            color: 'rgba(255,255,255,0.8)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            backdropFilter: 'blur(8px)',
+            transition: 'all 0.2s',
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          Languages
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{
+            transform: dropdownOpen ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+          }}>
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        {dropdownOpen && (
+          <div style={{
+            position: 'absolute', top: 'calc(100% + 6px)', left: 0,
+            background: 'rgba(28,42,53,0.95)',
+            border: '1px solid rgba(126,200,200,0.15)',
+            borderRadius: 12,
+            padding: '6px 0',
+            minWidth: 200,
+            backdropFilter: 'blur(12px)',
+            boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+            animation: 'dropdownIn 0.15s ease-out',
+          }}>
+            {languages.map((lang) => {
+              const name = lang.data?.languageName || lang.languageName;
+              const country = lang.data?.country || lang.country;
+              return (
+                <button
+                  key={lang.id}
+                  onClick={() => handleLanguageSelect(lang)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    width: '100%',
+                    padding: '9px 16px',
+                    background: 'none',
+                    border: 'none',
+                    color: lang.available ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
+                    fontSize: '0.84rem',
+                    cursor: 'pointer',
+                    transition: 'background 0.15s',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(126,200,200,0.08)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  <Flag code={lang.flagCode} size="1.1em" />
+                  <span style={{ flex: 1 }}>{name}</span>
+                  <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>{country}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         style={{ background: '#06090f' }}
       >
-        <GlobeScene onSelectLanguage={onSelectLanguage} />
+        <GlobeScene onSelectLanguage={onSelectLanguage} flyToPosition={flyToPosition} />
       </Canvas>
     </div>
   );
