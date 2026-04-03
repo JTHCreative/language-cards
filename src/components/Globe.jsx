@@ -151,16 +151,31 @@ function Atmosphere() {
 
 const LanguageFlag = memo(function LanguageFlag({ language, onClick, zoomScale = 1 }) {
   const [hovered, setHovered] = useState(false);
+  const [opacity, setOpacity] = useState(1);
   const coords = language.data?.coordinates || language.coordinates;
   const name = language.data?.languageName || language.languageName;
   const country = language.data?.country || language.country;
   const available = language.available;
   const flagCode = language.flagCode;
+  const opacityRef = useRef(1);
 
   const position = useMemo(
     () => latLngToVector3(coords.lat, coords.lng, 2.08),
     [coords]
   );
+
+  // Fade flags on the far side of the globe
+  useFrame(({ camera }) => {
+    const camDir = camera.position.clone().normalize();
+    const flagDir = new THREE.Vector3(...position.toArray()).normalize();
+    const dot = camDir.dot(flagDir); // 1 = facing camera, -1 = opposite side
+    // Map dot from [-1, 1] to opacity [0.1, 1]
+    const newOpacity = Math.max(0.1, Math.min(1, dot * 0.8 + 0.5));
+    if (Math.abs(opacityRef.current - newOpacity) > 0.03) {
+      opacityRef.current = newOpacity;
+      setOpacity(newOpacity);
+    }
+  });
 
   const baseSize = Math.round(22 * zoomScale);
   const hoverSize = Math.round(28 * zoomScale);
@@ -178,6 +193,8 @@ const LanguageFlag = memo(function LanguageFlag({ language, onClick, zoomScale =
             flexDirection: 'column',
             alignItems: 'center',
             userSelect: 'none',
+            opacity,
+            transition: 'opacity 0.3s ease',
           }}
         >
           {/* Flag */}
