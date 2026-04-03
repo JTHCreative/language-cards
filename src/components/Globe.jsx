@@ -29,76 +29,22 @@ function EarthGlobe() {
   );
 }
 
-// Generate nebula texture on a canvas
-function generateNebulaTexture(width = 2048, height = 1024) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-
-  // Dark base
-  ctx.fillStyle = '#06090f';
-  ctx.fillRect(0, 0, width, height);
-
-  // Large nebula clouds — use full-canvas fillRect so no edges
-  const clouds = [
-    { x: 0.25, y: 0.45, r: 0.4, c: [60, 100, 220], a: 0.3 },
-    { x: 0.72, y: 0.38, r: 0.42, c: [220, 80, 50], a: 0.25 },
-    { x: 0.48, y: 0.48, r: 0.28, c: [255, 180, 80], a: 0.18 },
-    { x: 0.15, y: 0.72, r: 0.35, c: [140, 50, 180], a: 0.18 },
-    { x: 0.82, y: 0.22, r: 0.3, c: [40, 140, 220], a: 0.2 },
-    { x: 0.58, y: 0.73, r: 0.25, c: [200, 60, 120], a: 0.15 },
-    { x: 0.35, y: 0.22, r: 0.26, c: [80, 180, 220], a: 0.14 },
-    { x: 0.88, y: 0.58, r: 0.22, c: [160, 70, 200], a: 0.16 },
-    { x: 0.5, y: 0.3, r: 0.2, c: [255, 140, 50], a: 0.1 },
-  ];
-
-  clouds.forEach(n => {
-    const grd = ctx.createRadialGradient(
-      n.x * width, n.y * height, 0,
-      n.x * width, n.y * height, n.r * Math.max(width, height)
-    );
-    grd.addColorStop(0, `rgba(${n.c[0]},${n.c[1]},${n.c[2]},${n.a})`);
-    grd.addColorStop(0.4, `rgba(${n.c[0]},${n.c[1]},${n.c[2]},${n.a * 0.3})`);
-    grd.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, width, height);
-  });
-
-  // Stars — single pixel dots
-  for (let i = 0; i < 3000; i++) {
-    const x = Math.floor(Math.random() * width);
-    const y = Math.floor(Math.random() * height);
-    const b = 0.2 + Math.random() * 0.8;
-    ctx.fillStyle = `rgba(255,255,255,${b})`;
-    ctx.fillRect(x, y, 1, 1);
+// Generate star positions for the CSS star layers
+function generateStarCSS(count, maxSize = 1) {
+  const stars = [];
+  for (let i = 0; i < count; i++) {
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    const size = Math.max(1, Math.round(Math.random() * maxSize));
+    const opacity = 0.3 + Math.random() * 0.7;
+    stars.push(`${x}vw ${y}vh 0 ${size - 1}px rgba(255,255,255,${opacity})`);
   }
-
-  // Brighter stars
-  for (let i = 0; i < 150; i++) {
-    const x = Math.floor(Math.random() * width);
-    const y = Math.floor(Math.random() * height);
-    ctx.fillStyle = `rgba(255,255,255,${0.6 + Math.random() * 0.4})`;
-    ctx.fillRect(x, y, 2, 1);
-    ctx.fillRect(x, y, 1, 2);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.mapping = THREE.EquirectangularReflectionMapping;
-  return texture;
+  return stars.join(', ');
 }
 
-// Set the scene background to the nebula texture (no geometry, no grid)
-function SpaceBackground() {
-  const { scene } = useThree();
-  const texture = useMemo(() => generateNebulaTexture(), []);
-
-  useMemo(() => {
-    scene.background = texture;
-  }, [scene, texture]);
-
-  return null;
-}
+const starsSmall = generateStarCSS(400, 1);
+const starsMedium = generateStarCSS(100, 2);
+const starsLarge = generateStarCSS(30, 3);
 
 // Atmospheric glow around the globe
 function Atmosphere() {
@@ -220,7 +166,6 @@ function GlobeScene({ onSelectLanguage }) {
       <directionalLight position={[-5, -2, -5]} intensity={0.6} />
       <pointLight position={[0, 10, 0]} intensity={0.5} />
 
-      <SpaceBackground />
       <EarthGlobe />
       <Atmosphere />
 
@@ -249,9 +194,47 @@ function GlobeScene({ onSelectLanguage }) {
 
 export default function Globe({ onSelectLanguage }) {
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={{
+      width: '100%',
+      height: '100%',
+      position: 'relative',
+      overflow: 'hidden',
+      background: [
+        'radial-gradient(ellipse at 25% 45%, rgba(60,100,220,0.3) 0%, transparent 50%)',
+        'radial-gradient(ellipse at 72% 38%, rgba(220,80,50,0.25) 0%, transparent 45%)',
+        'radial-gradient(ellipse at 48% 48%, rgba(255,180,80,0.15) 0%, transparent 35%)',
+        'radial-gradient(ellipse at 15% 72%, rgba(140,50,180,0.18) 0%, transparent 45%)',
+        'radial-gradient(ellipse at 82% 22%, rgba(40,140,220,0.2) 0%, transparent 40%)',
+        'radial-gradient(ellipse at 58% 75%, rgba(200,60,120,0.15) 0%, transparent 40%)',
+        'radial-gradient(ellipse at 35% 20%, rgba(80,180,220,0.12) 0%, transparent 40%)',
+        'radial-gradient(ellipse at 88% 58%, rgba(160,70,200,0.15) 0%, transparent 35%)',
+        '#06090f',
+      ].join(', '),
+    }}>
+      {/* Star layers */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        width: 1, height: 1,
+        boxShadow: starsSmall,
+        zIndex: 0,
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        width: 2, height: 2,
+        boxShadow: starsMedium,
+        zIndex: 0,
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        width: 3, height: 3,
+        borderRadius: '50%',
+        boxShadow: starsLarge,
+        zIndex: 0,
+      }} />
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
+        style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
+        gl={{ alpha: true }}
       >
         <GlobeScene onSelectLanguage={onSelectLanguage} />
       </Canvas>
