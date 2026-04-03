@@ -509,7 +509,6 @@ export default function Globe({ onSelectLanguage }) {
       const pos = latLngToVector3(coords.lat, coords.lng, 5);
       setFlyToPosition([pos.x, pos.y, pos.z]);
     }
-    setDropdownOpen(false);
   };
 
   return (
