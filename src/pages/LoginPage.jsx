@@ -39,6 +39,7 @@ export default function LoginPage({ onLogin }) {
       <div className="login-bg" />
       <div className="login-card">
         <div className="login-header">
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="FlipFluent" className="login-logo" />
           <h1>FlipFluent</h1>
           <p>Explore the world, one word at a time</p>
         </div>

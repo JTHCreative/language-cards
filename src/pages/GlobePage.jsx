@@ -14,6 +14,7 @@ export default function GlobePage({ user, onLogout }) {
     <div className="globe-page">
       <header className="globe-header">
         <div className="header-left">
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt="FlipFluent" className="header-logo" />
           <h1>FlipFluent</h1>
         </div>
         <div className="header-right">

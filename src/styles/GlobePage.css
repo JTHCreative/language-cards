@@ -23,10 +23,21 @@
   min-width: 0;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .header-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+.header-logo {
+  width: 32px;
+  height: 32px;
 }
 
 .globe-header h1 {
