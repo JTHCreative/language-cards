@@ -182,7 +182,7 @@ const LanguageFlag = memo(function LanguageFlag({ language, onClick, zoomScale =
 
   return (
     <group position={position}>
-      <Html center>
+      <Html center zIndexRange={hovered ? [1000, 1000] : [1, 10]}>
         <div
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
