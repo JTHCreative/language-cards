@@ -14,7 +14,7 @@ export default function GlobePage({ user, onLogout }) {
     <div className="globe-page">
       <header className="globe-header">
         <div className="header-left">
-          <h1>Language Cards</h1>
+          <h1>FlipFluent</h1>
         </div>
         <div className="header-right">
           <ProfileButton user={user} onLogout={onLogout} />

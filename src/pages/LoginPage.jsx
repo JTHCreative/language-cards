@@ -39,7 +39,7 @@ export default function LoginPage({ onLogin }) {
       <div className="login-bg" />
       <div className="login-card">
         <div className="login-header">
-          <h1>Language Cards</h1>
+          <h1>FlipFluent</h1>
           <p>Explore the world, one word at a time</p>
         </div>
 
