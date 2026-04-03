@@ -1,6 +1,7 @@
 // Registry of all available languages and their globe positions
 import cantoneseVocabulary from './cantonese';
 import portugueseVocabulary from './portuguese';
+import japaneseVocabulary from './japanese';
 
 const languages = [
   {
@@ -35,14 +36,11 @@ const languages = [
   },
   {
     id: 'japanese',
-    languageName: 'Japanese',
-    nativeName: '\u65E5\u672C\u8A9E',
-    country: 'Japan',
-    countryCode: 'JP',
+    data: japaneseVocabulary,
     flagCode: 'jp',
+    speechLangCode: 'ja-JP',
     theme: { primary: '#dc2626', secondary: '#f8f8f8', accent: '#fca5a5', bg1: '#1a0a0a', bg2: '#0f0505' },
-    coordinates: { lat: 36.2048, lng: 138.2529 },
-    available: false,
+    available: true,
   },
   {
     id: 'mandarin',
