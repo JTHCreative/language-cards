@@ -234,7 +234,7 @@ function useZoomScale(minDist = 3, maxDist = 8) {
   useFrame(() => {
     const dist = camera.position.length();
     const t = 1 - (Math.min(Math.max(dist, minDist), maxDist) - minDist) / (maxDist - minDist);
-    const newScale = 1 + t * 0.5;
+    const newScale = 1 + t * 1.2;
     if (Math.abs(scaleRef.current - newScale) > 0.02) {
       scaleRef.current = newScale;
       setScale(newScale);
