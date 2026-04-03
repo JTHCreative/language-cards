@@ -512,6 +512,7 @@ export default function Globe({ onSelectLanguage }) {
                 <button
                   key={lang.id}
                   onClick={() => handleLanguageSelect(lang)}
+                  title={!lang.available ? 'Coming Soon' : ''}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     width: '100%',
@@ -520,7 +521,7 @@ export default function Globe({ onSelectLanguage }) {
                     border: 'none',
                     color: lang.available ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
                     fontSize: '0.84rem',
-                    cursor: 'pointer',
+                    cursor: lang.available ? 'pointer' : 'default',
                     transition: 'background 0.15s',
                     textAlign: 'left',
                   }}
@@ -529,7 +530,11 @@ export default function Globe({ onSelectLanguage }) {
                 >
                   <Flag code={lang.flagCode} size="1.1em" />
                   <span style={{ flex: 1 }}>{name}</span>
-                  <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>{country}</span>
+                  {lang.available ? (
+                    <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>{country}</span>
+                  ) : (
+                    <span style={{ fontSize: '0.68rem', color: 'rgba(232,117,90,0.6)', fontStyle: 'italic' }}>Coming Soon</span>
+                  )}
                 </button>
               );
             })}
