@@ -82,75 +82,51 @@ function generateSpaceTexture(width = 2048, height = 1024) {
     }
   }
 
-  // No stars baked into the texture — they are rendered as 3D particles instead
-  // to avoid stretching at the poles of the skybox sphere
+  // Stars baked into the texture (single pixel dots — won't visibly stretch)
+  for (let i = 0; i < 2000; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const brightness = 0.3 + Math.random() * 0.7;
+    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
+    ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
+  }
+
+  // A few brighter stars (2-3px)
+  for (let i = 0; i < 200; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const brightness = 0.5 + Math.random() * 0.5;
+    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
+    ctx.fillRect(Math.floor(x), Math.floor(y), 2, 1);
+    ctx.fillRect(Math.floor(x), Math.floor(y), 1, 2);
+  }
+
+  // Handful of bright star glows
+  for (let i = 0; i < 15; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, 4 + Math.random() * 6);
+    const hue = Math.random() < 0.5 ? 210 + Math.random() * 30 : 30 + Math.random() * 20;
+    glow.addColorStop(0, `hsla(${hue},50%,90%,0.6)`);
+    glow.addColorStop(0.4, `hsla(${hue},50%,70%,0.15)`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(x - 10, y - 10, 20, 20);
+  }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.needsUpdate = true;
   return texture;
 }
 
-// Space skybox with generated nebula texture + star particles
+// Space skybox — nebula texture only, no 3D particle stars
 function Starfield() {
   const spaceTexture = useMemo(() => generateSpaceTexture(), []);
 
-  const starPositions = useMemo(() => {
-    const positions = new Float32Array(6000 * 3);
-    const colors = new Float32Array(6000 * 3);
-
-    for (let i = 0; i < 6000; i++) {
-      const radius = 42 + Math.random() * 16;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-
-      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = radius * Math.cos(phi);
-
-      const temp = Math.random();
-      if (temp < 0.1) {
-        colors[i * 3] = 0.6; colors[i * 3 + 1] = 0.75; colors[i * 3 + 2] = 1.0;
-      } else if (temp < 0.18) {
-        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.8; colors[i * 3 + 2] = 0.5;
-      } else {
-        colors[i * 3] = 1.0; colors[i * 3 + 1] = 1.0; colors[i * 3 + 2] = 1.0;
-      }
-    }
-    return { positions, colors };
-  }, []);
-
   return (
-    <group>
-      {/* Nebula skybox sphere — high segment count to avoid visible grid */}
-      <Sphere args={[50, 128, 64]}>
-        <meshBasicMaterial map={spaceTexture} side={THREE.BackSide} />
-      </Sphere>
-
-      {/* 3D star particles — rendered separately to avoid texture stretching */}
-      <points>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={6000}
-            array={starPositions.positions}
-            itemSize={3}
-          />
-          <bufferAttribute
-            attach="attributes-color"
-            count={6000}
-            array={starPositions.colors}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.06}
-          vertexColors
-          transparent
-          opacity={0.9}
-          sizeAttenuation
-        />
-      </points>
-    </group>
+    <Sphere args={[50, 128, 128]}>
+      <meshBasicMaterial map={spaceTexture} side={THREE.BackSide} />
+    </Sphere>
   );
 }
 
