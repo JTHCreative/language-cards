@@ -29,15 +29,13 @@ function EarthGlobe() {
   );
 }
 
-// Procedural starfield - thousands of star particles
+// Procedural starfield with nebula glows
 function Starfield() {
   const starPositions = useMemo(() => {
     const positions = new Float32Array(8000 * 3);
     const colors = new Float32Array(8000 * 3);
-    const sizes = new Float32Array(8000);
 
     for (let i = 0; i < 8000; i++) {
-      // Random position on a large sphere shell
       const radius = 40 + Math.random() * 20;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
@@ -46,55 +44,58 @@ function Starfield() {
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = radius * Math.cos(phi);
 
-      // Slight color variation: white, blue-white, warm-white
       const temp = Math.random();
-      if (temp < 0.15) {
-        // Blue-ish stars
-        colors[i * 3] = 0.7;
-        colors[i * 3 + 1] = 0.8;
-        colors[i * 3 + 2] = 1.0;
+      if (temp < 0.12) {
+        colors[i * 3] = 0.6; colors[i * 3 + 1] = 0.7; colors[i * 3 + 2] = 1.0;
+      } else if (temp < 0.2) {
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.85; colors[i * 3 + 2] = 0.6;
       } else if (temp < 0.25) {
-        // Warm/yellow stars
-        colors[i * 3] = 1.0;
-        colors[i * 3 + 1] = 0.95;
-        colors[i * 3 + 2] = 0.8;
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.6; colors[i * 3 + 2] = 0.7;
       } else {
-        // White stars
-        colors[i * 3] = 1.0;
-        colors[i * 3 + 1] = 1.0;
-        colors[i * 3 + 2] = 1.0;
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 1.0; colors[i * 3 + 2] = 1.0;
       }
-
-      sizes[i] = 0.3 + Math.random() * 1.2;
     }
-
-    return { positions, colors, sizes };
+    return { positions, colors };
   }, []);
 
-  // Milky Way band - denser cluster of dimmer stars along a plane
+  // Milky Way band
   const milkyWayPositions = useMemo(() => {
-    const positions = new Float32Array(4000 * 3);
-    const colors = new Float32Array(4000 * 3);
+    const positions = new Float32Array(5000 * 3);
+    const colors = new Float32Array(5000 * 3);
 
-    for (let i = 0; i < 4000; i++) {
+    for (let i = 0; i < 5000; i++) {
       const radius = 38 + Math.random() * 24;
       const theta = Math.random() * Math.PI * 2;
-      // Concentrate near a plane (small phi deviation) for milky way band
-      const phi = Math.PI / 2 + (Math.random() - 0.5) * 0.4;
+      const phi = Math.PI / 2 + (Math.random() - 0.5) * 0.35;
 
       positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = radius * Math.cos(phi);
 
-      // Dimmer, slightly blue/purple tint
-      const brightness = 0.3 + Math.random() * 0.4;
-      colors[i * 3] = brightness * 0.9;
-      colors[i * 3 + 1] = brightness * 0.85;
-      colors[i * 3 + 2] = brightness * 1.1;
+      const brightness = 0.3 + Math.random() * 0.5;
+      const tint = Math.random();
+      if (tint < 0.3) {
+        colors[i * 3] = brightness * 0.8; colors[i * 3 + 1] = brightness * 0.7; colors[i * 3 + 2] = brightness * 1.2;
+      } else if (tint < 0.5) {
+        colors[i * 3] = brightness * 1.1; colors[i * 3 + 1] = brightness * 0.85; colors[i * 3 + 2] = brightness * 1.0;
+      } else {
+        colors[i * 3] = brightness * 0.85; colors[i * 3 + 1] = brightness * 0.85; colors[i * 3 + 2] = brightness * 1.1;
+      }
     }
-
     return { positions, colors };
   }, []);
+
+  // Nebula glow definitions: position, color, size
+  const nebulae = useMemo(() => [
+    { pos: [30, 15, -25], color: '#4466cc', scale: 12, opacity: 0.06 },
+    { pos: [-25, -10, 30], color: '#cc4488', scale: 10, opacity: 0.05 },
+    { pos: [15, -30, -20], color: '#8844aa', scale: 14, opacity: 0.04 },
+    { pos: [-35, 20, 10], color: '#44aacc', scale: 9, opacity: 0.05 },
+    { pos: [20, 25, 30], color: '#cc8844', scale: 8, opacity: 0.06 },
+    { pos: [-10, -25, -35], color: '#aa44cc', scale: 11, opacity: 0.04 },
+    { pos: [35, -5, 15], color: '#4488aa', scale: 10, opacity: 0.05 },
+    { pos: [-20, 30, -25], color: '#cc6688', scale: 7, opacity: 0.05 },
+  ], []);
 
   return (
     <group>
@@ -128,13 +129,13 @@ function Starfield() {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={4000}
+            count={5000}
             array={milkyWayPositions.positions}
             itemSize={3}
           />
           <bufferAttribute
             attach="attributes-color"
-            count={4000}
+            count={5000}
             array={milkyWayPositions.colors}
             itemSize={3}
           />
@@ -147,6 +148,19 @@ function Starfield() {
           sizeAttenuation
         />
       </points>
+
+      {/* Nebula glows - soft colored spheres in the background */}
+      {nebulae.map((n, i) => (
+        <mesh key={i} position={n.pos}>
+          <sphereGeometry args={[n.scale, 16, 16]} />
+          <meshBasicMaterial
+            color={n.color}
+            transparent
+            opacity={n.opacity}
+            depthWrite={false}
+          />
+        </mesh>
+      ))}
     </group>
   );
 }
@@ -303,7 +317,7 @@ export default function Globe({ onSelectLanguage }) {
     <div style={{ width: '100%', height: '100%' }}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ background: '#000005' }}
+        style={{ background: '#06090f' }}
       >
         <GlobeScene onSelectLanguage={onSelectLanguage} />
       </Canvas>
