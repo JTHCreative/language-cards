@@ -500,7 +500,7 @@ export default function Globe({ onSelectLanguage }) {
             border: '1px solid rgba(126,200,200,0.15)',
             borderRadius: 12,
             padding: '6px 0',
-            minWidth: 200,
+            minWidth: 240,
             backdropFilter: 'blur(12px)',
             boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
             animation: 'dropdownIn 0.15s ease-out',
