@@ -4,6 +4,7 @@ import { OrbitControls, Html, Sphere, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { getAllLanguages } from '../data/languages';
 import Flag from './Flag';
+import '../styles/LanguageDropdown.css';
 
 // Convert lat/lng to 3D position on sphere
 function latLngToVector3(lat, lng, radius) {
@@ -514,10 +515,11 @@ export default function Globe({ onSelectLanguage }) {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       {/* Language selector */}
-      <div ref={dropdownRef} style={{
+      <div ref={dropdownRef} className="lang-dropdown-wrapper" style={{
         position: 'absolute', top: 16, left: 16, zIndex: 10,
       }}>
         <button
+          className="lang-dropdown-btn"
           onClick={() => setDropdownOpen(!dropdownOpen)}
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
@@ -538,7 +540,7 @@ export default function Globe({ onSelectLanguage }) {
             <line x1="2" y1="12" x2="22" y2="12"/>
             <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
           </svg>
-          Languages
+          <span className="btn-label">Languages</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{
             transform: dropdownOpen ? 'rotate(180deg)' : 'none',
             transition: 'transform 0.2s',
@@ -548,7 +550,7 @@ export default function Globe({ onSelectLanguage }) {
         </button>
 
         {dropdownOpen && (
-          <div style={{
+          <div className="lang-dropdown-menu" style={{
             position: 'absolute', top: 'calc(100% + 6px)', left: 0,
             background: 'rgba(28,42,53,0.95)',
             border: '1px solid rgba(126,200,200,0.15)',
