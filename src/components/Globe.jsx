@@ -442,6 +442,61 @@ function GlobeScene({ onSelectLanguage, flyToPosition }) {
   );
 }
 
+function LanguageDropdownRow({ lang, onSelect }) {
+  const [hovered, setHovered] = useState(false);
+  const name = lang.data?.languageName || lang.languageName;
+  const country = lang.data?.country || lang.country;
+
+  return (
+    <button
+      onClick={() => onSelect(lang)}
+      onMouseEnter={(e) => { setHovered(true); e.currentTarget.style.background = 'rgba(126,200,200,0.08)'; }}
+      onMouseLeave={(e) => { setHovered(false); e.currentTarget.style.background = 'none'; }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: 10,
+        width: '100%',
+        padding: '9px 16px',
+        background: 'none',
+        border: 'none',
+        color: lang.available ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
+        fontSize: '0.84rem',
+        cursor: lang.available ? 'pointer' : 'default',
+        transition: 'background 0.15s',
+        textAlign: 'left',
+        position: 'relative',
+      }}
+    >
+      <Flag code={lang.flagCode} size="1.1em" />
+      <span style={{ flex: 1 }}>{name}</span>
+      <span style={{
+        fontSize: '0.72rem',
+        color: 'rgba(255,255,255,0.3)',
+        position: 'relative',
+      }}>
+        {country}
+        {!lang.available && hovered && (
+          <span style={{
+            position: 'absolute',
+            right: 0,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(232,117,90,0.9)',
+            color: '#fff',
+            padding: '3px 8px',
+            borderRadius: 6,
+            fontSize: '0.68rem',
+            fontWeight: 600,
+            whiteSpace: 'nowrap',
+            animation: 'comingSoonFade 0.2s ease-out',
+          }}>
+            Coming Soon
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
+
 export default function Globe({ onSelectLanguage }) {
   const [flyToPosition, setFlyToPosition] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -505,42 +560,23 @@ export default function Globe({ onSelectLanguage }) {
             boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
             animation: 'dropdownIn 0.15s ease-out',
           }}>
-            {languages.map((lang) => {
-              const name = lang.data?.languageName || lang.languageName;
-              const country = lang.data?.country || lang.country;
-              return (
-                <button
-                  key={lang.id}
-                  onClick={() => handleLanguageSelect(lang)}
-                  title={!lang.available ? 'Coming Soon' : ''}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    width: '100%',
-                    padding: '9px 16px',
-                    background: 'none',
-                    border: 'none',
-                    color: lang.available ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.35)',
-                    fontSize: '0.84rem',
-                    cursor: lang.available ? 'pointer' : 'default',
-                    transition: 'background 0.15s',
-                    textAlign: 'left',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(126,200,200,0.08)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                >
-                  <Flag code={lang.flagCode} size="1.1em" />
-                  <span style={{ flex: 1 }}>{name}</span>
-                  {lang.available ? (
-                    <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>{country}</span>
-                  ) : (
-                    <span style={{ fontSize: '0.68rem', color: 'rgba(232,117,90,0.6)', fontStyle: 'italic' }}>Coming Soon</span>
-                  )}
-                </button>
-              );
-            })}
+            {languages.map((lang) => (
+              <LanguageDropdownRow
+                key={lang.id}
+                lang={lang}
+                onSelect={handleLanguageSelect}
+              />
+            ))}
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes comingSoonFade {
+          from { opacity: 0; transform: translateY(-50%) translateX(4px); }
+          to { opacity: 1; transform: translateY(-50%) translateX(0); }
+        }
+      `}</style>
 
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
