@@ -1,6 +1,6 @@
 // Custom flags that aren't in the flag-icons package
 const customFlags = {
-  hi: true, // Hawaiian flag
+  hi: 'png', // Hawaiian flag
 };
 
 // Renders a country flag using flag-icons CSS, or a custom SVG for special cases
@@ -22,7 +22,7 @@ export default function Flag({ code, size = '1.5em', className = '', style = {} 
           backgroundSize: 'contain',
           backgroundPosition: '50%',
           backgroundRepeat: 'no-repeat',
-          backgroundImage: `url(${import.meta.env.BASE_URL}flags/${code}.svg)`,
+          backgroundImage: `url(${import.meta.env.BASE_URL}flags/${code}.${customFlags[code]})`,
           borderRadius: '3px',
           ...style,
         }}
