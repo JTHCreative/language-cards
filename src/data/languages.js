@@ -1,5 +1,6 @@
 // Registry of all available languages and their globe positions
 import cantoneseVocabulary from './cantonese';
+import portugueseVocabulary from './portuguese';
 
 const languages = [
   {
@@ -78,14 +79,11 @@ const languages = [
   },
   {
     id: 'portuguese',
-    languageName: 'Portuguese',
-    nativeName: 'Portugu\u00eas',
-    country: 'Brazil',
-    countryCode: 'BR',
+    data: portugueseVocabulary,
     flagCode: 'br',
+    speechLangCode: 'pt-BR',
     theme: { primary: '#16a34a', secondary: '#f59e0b', accent: '#4ade80', bg1: '#0a1a0e', bg2: '#051008' },
-    coordinates: { lat: -14.235, lng: -51.9253 },
-    available: false,
+    available: true,
   },
   {
     id: 'italian',
