@@ -37,9 +37,10 @@ function createGlowTexture(size = 128) {
   const ctx = canvas.getContext('2d');
   const center = size / 2;
   const grd = ctx.createRadialGradient(center, center, 0, center, center, center);
-  grd.addColorStop(0, 'rgba(255,255,255,1)');
-  grd.addColorStop(0.3, 'rgba(255,255,255,0.4)');
-  grd.addColorStop(0.7, 'rgba(255,255,255,0.08)');
+  grd.addColorStop(0, 'rgba(255,255,255,0.6)');
+  grd.addColorStop(0.15, 'rgba(255,255,255,0.3)');
+  grd.addColorStop(0.35, 'rgba(255,255,255,0.12)');
+  grd.addColorStop(0.6, 'rgba(255,255,255,0.03)');
   grd.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = grd;
   ctx.fillRect(0, 0, size, size);
@@ -52,16 +53,18 @@ function SpaceEnvironment() {
   const glowTexture = useMemo(() => createGlowTexture(), []);
 
   const nebulaData = useMemo(() => [
-    { pos: [-30, 15, -35], color: '#3c64dc', scale: 25, opacity: 0.12 },
-    { pos: [28, -8, -40], color: '#dc5032', scale: 28, opacity: 0.1 },
-    { pos: [-5, 20, -45], color: '#ffb450', scale: 18, opacity: 0.08 },
-    { pos: [-35, -15, -30], color: '#8c32b4', scale: 22, opacity: 0.09 },
-    { pos: [35, 18, -38], color: '#288cdc', scale: 20, opacity: 0.1 },
-    { pos: [15, -25, -42], color: '#c83c78', scale: 22, opacity: 0.07 },
-    { pos: [-20, -25, -35], color: '#50b4dc', scale: 18, opacity: 0.07 },
-    { pos: [25, 28, -36], color: '#a046c8', scale: 16, opacity: 0.08 },
-    { pos: [-15, 5, -50], color: '#4060aa', scale: 30, opacity: 0.06 },
-    { pos: [5, -10, -48], color: '#cc6040', scale: 24, opacity: 0.06 },
+    { pos: [-30, 15, -30], color: '#3c64dc', scale: 55, opacity: 0.14 },
+    { pos: [28, -8, -32], color: '#dc5032', scale: 60, opacity: 0.12 },
+    { pos: [-5, 22, -38], color: '#ffb450', scale: 45, opacity: 0.1 },
+    { pos: [-38, -15, -25], color: '#8c32b4', scale: 50, opacity: 0.11 },
+    { pos: [35, 18, -30], color: '#288cdc', scale: 48, opacity: 0.12 },
+    { pos: [15, -28, -34], color: '#c83c78', scale: 50, opacity: 0.09 },
+    { pos: [-22, -28, -28], color: '#50b4dc', scale: 42, opacity: 0.09 },
+    { pos: [25, 30, -28], color: '#a046c8', scale: 40, opacity: 0.1 },
+    { pos: [-15, 5, -42], color: '#4060aa', scale: 65, opacity: 0.08 },
+    { pos: [5, -10, -40], color: '#cc6040', scale: 52, opacity: 0.08 },
+    { pos: [0, 0, -45], color: '#2a3a6a', scale: 80, opacity: 0.06 },
+    { pos: [-30, 25, -35], color: '#cc8855', scale: 35, opacity: 0.07 },
   ], []);
 
   const starPositions = useMemo(() => {
