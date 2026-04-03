@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Rounded rectangle card (teal/mint) -->
+  <rect x="12" y="12" width="65" height="75" rx="14" ry="14" fill="#7EC8C8" />
+
+  <!-- Small square accent (top right of card) -->
+  <rect x="68" y="8" width="10" height="10" rx="2" ry="2" fill="#E8755A" />
+
+  <!-- Speech bubble (coral/orange) -->
+  <ellipse cx="72" cy="62" rx="32" ry="30" fill="#E8755A" />
+  <!-- Speech bubble tail -->
+  <path d="M52 82 Q48 98 38 96 Q48 92 50 82 Z" fill="#E8755A" />
+
+  <!-- White speech bubble outline/overlap -->
+  <ellipse cx="48" cy="55" rx="28" ry="26" fill="white" />
+  <!-- White speech bubble tail -->
+  <path d="M28 72 Q18 90 10 86 Q20 84 26 72 Z" fill="white" />
+</svg>
