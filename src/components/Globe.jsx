@@ -29,22 +29,108 @@ function EarthGlobe() {
   );
 }
 
-// Generate star positions for the CSS star layers
-function generateStarCSS(count, maxSize = 1) {
-  const stars = [];
-  for (let i = 0; i < count; i++) {
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
-    const size = Math.max(1, Math.round(Math.random() * maxSize));
-    const opacity = 0.3 + Math.random() * 0.7;
-    stars.push(`${x}vw ${y}vh 0 ${size - 1}px rgba(255,255,255,${opacity})`);
-  }
-  return stars.join(', ');
+// Create a soft radial glow texture for nebula sprites
+function createGlowTexture(size = 128) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const center = size / 2;
+  const grd = ctx.createRadialGradient(center, center, 0, center, center, center);
+  grd.addColorStop(0, 'rgba(255,255,255,1)');
+  grd.addColorStop(0.3, 'rgba(255,255,255,0.4)');
+  grd.addColorStop(0.7, 'rgba(255,255,255,0.08)');
+  grd.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  return tex;
 }
 
-const starsSmall = generateStarCSS(400, 1);
-const starsMedium = generateStarCSS(100, 2);
-const starsLarge = generateStarCSS(30, 3);
+// Nebula clouds as sprites + star particles
+function SpaceEnvironment() {
+  const glowTexture = useMemo(() => createGlowTexture(), []);
+
+  const nebulaData = useMemo(() => [
+    { pos: [-30, 15, -35], color: '#3c64dc', scale: 25, opacity: 0.12 },
+    { pos: [28, -8, -40], color: '#dc5032', scale: 28, opacity: 0.1 },
+    { pos: [-5, 20, -45], color: '#ffb450', scale: 18, opacity: 0.08 },
+    { pos: [-35, -15, -30], color: '#8c32b4', scale: 22, opacity: 0.09 },
+    { pos: [35, 18, -38], color: '#288cdc', scale: 20, opacity: 0.1 },
+    { pos: [15, -25, -42], color: '#c83c78', scale: 22, opacity: 0.07 },
+    { pos: [-20, -25, -35], color: '#50b4dc', scale: 18, opacity: 0.07 },
+    { pos: [25, 28, -36], color: '#a046c8', scale: 16, opacity: 0.08 },
+    { pos: [-15, 5, -50], color: '#4060aa', scale: 30, opacity: 0.06 },
+    { pos: [5, -10, -48], color: '#cc6040', scale: 24, opacity: 0.06 },
+  ], []);
+
+  const starPositions = useMemo(() => {
+    const count = 5000;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const radius = 35 + Math.random() * 25;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+      const b = 0.5 + Math.random() * 0.5;
+      const temp = Math.random();
+      if (temp < 0.1) {
+        colors[i * 3] = b * 0.7; colors[i * 3 + 1] = b * 0.8; colors[i * 3 + 2] = b;
+      } else if (temp < 0.18) {
+        colors[i * 3] = b; colors[i * 3 + 1] = b * 0.9; colors[i * 3 + 2] = b * 0.7;
+      } else {
+        colors[i * 3] = b; colors[i * 3 + 1] = b; colors[i * 3 + 2] = b;
+      }
+    }
+    return { positions, colors, count };
+  }, []);
+
+  return (
+    <group>
+      {/* Nebula glow sprites */}
+      {nebulaData.map((n, i) => (
+        <sprite key={i} position={n.pos} scale={[n.scale, n.scale, 1]}>
+          <spriteMaterial
+            map={glowTexture}
+            color={n.color}
+            transparent
+            opacity={n.opacity}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </sprite>
+      ))}
+
+      {/* Star particles */}
+      <points>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={starPositions.count}
+            array={starPositions.positions}
+            itemSize={3}
+          />
+          <bufferAttribute
+            attach="attributes-color"
+            count={starPositions.count}
+            array={starPositions.colors}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.08}
+          vertexColors
+          transparent
+          opacity={0.9}
+          sizeAttenuation={false}
+        />
+      </points>
+    </group>
+  );
+}
 
 // Atmospheric glow around the globe
 function Atmosphere() {
@@ -166,6 +252,7 @@ function GlobeScene({ onSelectLanguage }) {
       <directionalLight position={[-5, -2, -5]} intensity={0.6} />
       <pointLight position={[0, 10, 0]} intensity={0.5} />
 
+      <SpaceEnvironment />
       <EarthGlobe />
       <Atmosphere />
 
@@ -194,47 +281,10 @@ function GlobeScene({ onSelectLanguage }) {
 
 export default function Globe({ onSelectLanguage }) {
   return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      position: 'relative',
-      overflow: 'hidden',
-      background: [
-        'radial-gradient(ellipse at 25% 45%, rgba(60,100,220,0.3) 0%, transparent 50%)',
-        'radial-gradient(ellipse at 72% 38%, rgba(220,80,50,0.25) 0%, transparent 45%)',
-        'radial-gradient(ellipse at 48% 48%, rgba(255,180,80,0.15) 0%, transparent 35%)',
-        'radial-gradient(ellipse at 15% 72%, rgba(140,50,180,0.18) 0%, transparent 45%)',
-        'radial-gradient(ellipse at 82% 22%, rgba(40,140,220,0.2) 0%, transparent 40%)',
-        'radial-gradient(ellipse at 58% 75%, rgba(200,60,120,0.15) 0%, transparent 40%)',
-        'radial-gradient(ellipse at 35% 20%, rgba(80,180,220,0.12) 0%, transparent 40%)',
-        'radial-gradient(ellipse at 88% 58%, rgba(160,70,200,0.15) 0%, transparent 35%)',
-        '#06090f',
-      ].join(', '),
-    }}>
-      {/* Star layers */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        width: 1, height: 1,
-        boxShadow: starsSmall,
-        zIndex: 0,
-      }} />
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        width: 2, height: 2,
-        boxShadow: starsMedium,
-        zIndex: 0,
-      }} />
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        width: 3, height: 3,
-        borderRadius: '50%',
-        boxShadow: starsLarge,
-        zIndex: 0,
-      }} />
+    <div style={{ width: '100%', height: '100%' }}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
-        gl={{ alpha: true }}
+        style={{ background: '#06090f' }}
       >
         <GlobeScene onSelectLanguage={onSelectLanguage} />
       </Canvas>
