@@ -29,14 +29,99 @@ function EarthGlobe() {
   );
 }
 
-// Procedural starfield with nebula glows
-function Starfield() {
-  const starPositions = useMemo(() => {
-    const positions = new Float32Array(8000 * 3);
-    const colors = new Float32Array(8000 * 3);
+// Generate a nebula/space texture on a 2D canvas
+function generateSpaceTexture(width = 2048, height = 1024) {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
 
-    for (let i = 0; i < 8000; i++) {
-      const radius = 40 + Math.random() * 20;
+  // Dark base
+  ctx.fillStyle = '#070b15';
+  ctx.fillRect(0, 0, width, height);
+
+  // Nebula clouds - layered radial gradients
+  const nebulae = [
+    { x: 0.25, y: 0.45, r: 0.4, colors: ['rgba(60,100,220,0.35)', 'rgba(30,60,160,0.15)', 'rgba(10,15,40,0)'] },
+    { x: 0.7, y: 0.4, r: 0.45, colors: ['rgba(220,80,50,0.3)', 'rgba(200,100,40,0.12)', 'rgba(10,10,20,0)'] },
+    { x: 0.45, y: 0.5, r: 0.3, colors: ['rgba(255,200,100,0.25)', 'rgba(220,120,60,0.1)', 'rgba(10,10,20,0)'] },
+    { x: 0.15, y: 0.7, r: 0.35, colors: ['rgba(150,50,180,0.2)', 'rgba(80,30,120,0.08)', 'rgba(10,10,20,0)'] },
+    { x: 0.8, y: 0.25, r: 0.3, colors: ['rgba(40,140,220,0.25)', 'rgba(20,80,160,0.1)', 'rgba(10,10,20,0)'] },
+    { x: 0.55, y: 0.7, r: 0.25, colors: ['rgba(200,60,120,0.2)', 'rgba(120,30,80,0.08)', 'rgba(10,10,20,0)'] },
+    { x: 0.35, y: 0.25, r: 0.28, colors: ['rgba(80,180,220,0.18)', 'rgba(40,100,160,0.07)', 'rgba(10,10,20,0)'] },
+    { x: 0.9, y: 0.6, r: 0.22, colors: ['rgba(180,80,200,0.2)', 'rgba(100,40,140,0.08)', 'rgba(10,10,20,0)'] },
+  ];
+
+  nebulae.forEach(n => {
+    const grd = ctx.createRadialGradient(
+      n.x * width, n.y * height, 0,
+      n.x * width, n.y * height, n.r * width
+    );
+    grd.addColorStop(0, n.colors[0]);
+    grd.addColorStop(0.5, n.colors[1]);
+    grd.addColorStop(1, n.colors[2]);
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, width, height);
+  });
+
+  // Wispy cloud layers using noise-like random passes
+  for (let pass = 0; pass < 3; pass++) {
+    for (let i = 0; i < 600; i++) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const r = 20 + Math.random() * 80;
+      const hue = Math.random() < 0.5 ? 220 + Math.random() * 40 : 10 + Math.random() * 30;
+      const sat = 40 + Math.random() * 40;
+      const light = 30 + Math.random() * 30;
+      const alpha = 0.01 + Math.random() * 0.03;
+      const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
+      grd.addColorStop(0, `hsla(${hue},${sat}%,${light}%,${alpha})`);
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+  }
+
+  // Bright star points
+  for (let i = 0; i < 1500; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const size = Math.random() < 0.05 ? 1.5 + Math.random() * 1.5 : 0.5 + Math.random() * 0.8;
+    const brightness = 0.4 + Math.random() * 0.6;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
+    ctx.fill();
+  }
+
+  // Bright prominent stars with glow
+  for (let i = 0; i < 30; i++) {
+    const x = Math.random() * width;
+    const y = Math.random() * height;
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, 8 + Math.random() * 12);
+    const hue = Math.random() < 0.5 ? 200 + Math.random() * 40 : 30 + Math.random() * 20;
+    glow.addColorStop(0, `hsla(${hue},60%,90%,0.8)`);
+    glow.addColorStop(0.3, `hsla(${hue},60%,70%,0.2)`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(x - 20, y - 20, 40, 40);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.needsUpdate = true;
+  return texture;
+}
+
+// Space skybox with generated nebula texture + star particles
+function Starfield() {
+  const spaceTexture = useMemo(() => generateSpaceTexture(), []);
+
+  const starPositions = useMemo(() => {
+    const positions = new Float32Array(6000 * 3);
+    const colors = new Float32Array(6000 * 3);
+
+    for (let i = 0; i < 6000; i++) {
+      const radius = 42 + Math.random() * 16;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
 
@@ -45,12 +130,10 @@ function Starfield() {
       positions[i * 3 + 2] = radius * Math.cos(phi);
 
       const temp = Math.random();
-      if (temp < 0.12) {
-        colors[i * 3] = 0.6; colors[i * 3 + 1] = 0.7; colors[i * 3 + 2] = 1.0;
-      } else if (temp < 0.2) {
-        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.85; colors[i * 3 + 2] = 0.6;
-      } else if (temp < 0.25) {
-        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.6; colors[i * 3 + 2] = 0.7;
+      if (temp < 0.1) {
+        colors[i * 3] = 0.6; colors[i * 3 + 1] = 0.75; colors[i * 3 + 2] = 1.0;
+      } else if (temp < 0.18) {
+        colors[i * 3] = 1.0; colors[i * 3 + 1] = 0.8; colors[i * 3 + 2] = 0.5;
       } else {
         colors[i * 3] = 1.0; colors[i * 3 + 1] = 1.0; colors[i * 3 + 2] = 1.0;
       }
@@ -58,109 +141,37 @@ function Starfield() {
     return { positions, colors };
   }, []);
 
-  // Milky Way band
-  const milkyWayPositions = useMemo(() => {
-    const positions = new Float32Array(5000 * 3);
-    const colors = new Float32Array(5000 * 3);
-
-    for (let i = 0; i < 5000; i++) {
-      const radius = 38 + Math.random() * 24;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.PI / 2 + (Math.random() - 0.5) * 0.35;
-
-      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = radius * Math.cos(phi);
-
-      const brightness = 0.3 + Math.random() * 0.5;
-      const tint = Math.random();
-      if (tint < 0.3) {
-        colors[i * 3] = brightness * 0.8; colors[i * 3 + 1] = brightness * 0.7; colors[i * 3 + 2] = brightness * 1.2;
-      } else if (tint < 0.5) {
-        colors[i * 3] = brightness * 1.1; colors[i * 3 + 1] = brightness * 0.85; colors[i * 3 + 2] = brightness * 1.0;
-      } else {
-        colors[i * 3] = brightness * 0.85; colors[i * 3 + 1] = brightness * 0.85; colors[i * 3 + 2] = brightness * 1.1;
-      }
-    }
-    return { positions, colors };
-  }, []);
-
-  // Nebula glow definitions: position, color, size
-  const nebulae = useMemo(() => [
-    { pos: [30, 15, -25], color: '#4466cc', scale: 12, opacity: 0.06 },
-    { pos: [-25, -10, 30], color: '#cc4488', scale: 10, opacity: 0.05 },
-    { pos: [15, -30, -20], color: '#8844aa', scale: 14, opacity: 0.04 },
-    { pos: [-35, 20, 10], color: '#44aacc', scale: 9, opacity: 0.05 },
-    { pos: [20, 25, 30], color: '#cc8844', scale: 8, opacity: 0.06 },
-    { pos: [-10, -25, -35], color: '#aa44cc', scale: 11, opacity: 0.04 },
-    { pos: [35, -5, 15], color: '#4488aa', scale: 10, opacity: 0.05 },
-    { pos: [-20, 30, -25], color: '#cc6688', scale: 7, opacity: 0.05 },
-  ], []);
-
   return (
     <group>
-      {/* Main stars */}
+      {/* Nebula skybox sphere */}
+      <Sphere args={[50, 64, 64]}>
+        <meshBasicMaterial map={spaceTexture} side={THREE.BackSide} />
+      </Sphere>
+
+      {/* 3D star particles on top */}
       <points>
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={8000}
+            count={6000}
             array={starPositions.positions}
             itemSize={3}
           />
           <bufferAttribute
             attach="attributes-color"
-            count={8000}
+            count={6000}
             array={starPositions.colors}
             itemSize={3}
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.15}
+          size={0.12}
           vertexColors
           transparent
-          opacity={0.9}
+          opacity={0.85}
           sizeAttenuation
         />
       </points>
-
-      {/* Milky Way band */}
-      <points>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={5000}
-            array={milkyWayPositions.positions}
-            itemSize={3}
-          />
-          <bufferAttribute
-            attach="attributes-color"
-            count={5000}
-            array={milkyWayPositions.colors}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          size={0.08}
-          vertexColors
-          transparent
-          opacity={0.6}
-          sizeAttenuation
-        />
-      </points>
-
-      {/* Nebula glows - soft colored spheres in the background */}
-      {nebulae.map((n, i) => (
-        <mesh key={i} position={n.pos}>
-          <sphereGeometry args={[n.scale, 16, 16]} />
-          <meshBasicMaterial
-            color={n.color}
-            transparent
-            opacity={n.opacity}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
     </group>
   );
 }
