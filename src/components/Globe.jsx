@@ -244,18 +244,123 @@ function useZoomScale(minDist = 3, maxDist = 8) {
   return scale;
 }
 
+// Create lens flare textures
+function createFlareTexture(size = 128, style = 'core') {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const center = size / 2;
+
+  if (style === 'core') {
+    // Bright white core with warm halo
+    const grd = ctx.createRadialGradient(center, center, 0, center, center, center);
+    grd.addColorStop(0, 'rgba(255,255,240,1)');
+    grd.addColorStop(0.08, 'rgba(255,250,220,0.9)');
+    grd.addColorStop(0.2, 'rgba(255,220,150,0.4)');
+    grd.addColorStop(0.5, 'rgba(255,180,80,0.08)');
+    grd.addColorStop(1, 'rgba(255,150,50,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, size, size);
+  } else if (style === 'rays') {
+    // Star rays
+    ctx.translate(center, center);
+    for (let i = 0; i < 6; i++) {
+      ctx.rotate(Math.PI / 3);
+      const grd = ctx.createLinearGradient(0, 0, center * 0.9, 0);
+      grd.addColorStop(0, 'rgba(255,240,200,0.5)');
+      grd.addColorStop(0.3, 'rgba(255,220,160,0.1)');
+      grd.addColorStop(1, 'rgba(255,200,100,0)');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, -1.5, center * 0.9, 3);
+    }
+  } else if (style === 'ring') {
+    // Subtle ring flare
+    const grd = ctx.createRadialGradient(center, center, center * 0.6, center, center, center * 0.8);
+    grd.addColorStop(0, 'rgba(255,200,100,0)');
+    grd.addColorStop(0.4, 'rgba(255,220,150,0.06)');
+    grd.addColorStop(0.6, 'rgba(255,200,120,0.03)');
+    grd.addColorStop(1, 'rgba(255,180,80,0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, size, size);
+  }
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Sun with lens flare at the main light position
+const SUN_POS = [5, 3, 5];
+
+function Sun() {
+  const coreTexture = useMemo(() => createFlareTexture(256, 'core'), []);
+  const raysTexture = useMemo(() => createFlareTexture(256, 'rays'), []);
+  const ringTexture = useMemo(() => createFlareTexture(256, 'ring'), []);
+
+  // Normalize and extend sun position far out
+  const sunDir = useMemo(() => {
+    const v = new THREE.Vector3(...SUN_POS).normalize().multiplyScalar(18);
+    return [v.x, v.y, v.z];
+  }, []);
+
+  return (
+    <group position={sunDir}>
+      {/* Sun core glow */}
+      <sprite scale={[4, 4, 1]}>
+        <spriteMaterial
+          map={coreTexture}
+          transparent
+          opacity={1}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </sprite>
+      {/* Star rays */}
+      <sprite scale={[8, 8, 1]}>
+        <spriteMaterial
+          map={raysTexture}
+          transparent
+          opacity={0.6}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </sprite>
+      {/* Outer glow */}
+      <sprite scale={[12, 12, 1]}>
+        <spriteMaterial
+          map={coreTexture}
+          transparent
+          opacity={0.15}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          color="#ffcc66"
+        />
+      </sprite>
+      {/* Ring flare */}
+      <sprite scale={[16, 16, 1]}>
+        <spriteMaterial
+          map={ringTexture}
+          transparent
+          opacity={0.4}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </sprite>
+    </group>
+  );
+}
+
 function GlobeScene({ onSelectLanguage }) {
   const languages = getAllLanguages();
   const zoomScale = useZoomScale(3, 8);
 
   return (
     <>
-      <ambientLight intensity={1.2} />
-      <directionalLight position={[5, 3, 5]} intensity={1.5} />
-      <directionalLight position={[-5, -2, -5]} intensity={0.6} />
-      <pointLight position={[0, 10, 0]} intensity={0.5} />
+      <ambientLight intensity={0.8} />
+      <directionalLight position={SUN_POS} intensity={1.8} />
+      <directionalLight position={[-5, -2, -5]} intensity={0.3} />
 
       <SpaceEnvironment />
+      <Sun />
       <EarthGlobe />
       <Atmosphere />
 
