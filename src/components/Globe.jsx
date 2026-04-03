@@ -29,107 +29,7 @@ function EarthGlobe() {
   );
 }
 
-// Generate a nebula/space texture on a 2D canvas
-function generateSpaceTexture(width = 2048, height = 1024) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-
-  // Dark base
-  ctx.fillStyle = '#070b15';
-  ctx.fillRect(0, 0, width, height);
-
-  // Nebula clouds - layered radial gradients
-  const nebulae = [
-    { x: 0.25, y: 0.45, r: 0.4, colors: ['rgba(60,100,220,0.35)', 'rgba(30,60,160,0.15)', 'rgba(10,15,40,0)'] },
-    { x: 0.7, y: 0.4, r: 0.45, colors: ['rgba(220,80,50,0.3)', 'rgba(200,100,40,0.12)', 'rgba(10,10,20,0)'] },
-    { x: 0.45, y: 0.5, r: 0.3, colors: ['rgba(255,200,100,0.25)', 'rgba(220,120,60,0.1)', 'rgba(10,10,20,0)'] },
-    { x: 0.15, y: 0.7, r: 0.35, colors: ['rgba(150,50,180,0.2)', 'rgba(80,30,120,0.08)', 'rgba(10,10,20,0)'] },
-    { x: 0.8, y: 0.25, r: 0.3, colors: ['rgba(40,140,220,0.25)', 'rgba(20,80,160,0.1)', 'rgba(10,10,20,0)'] },
-    { x: 0.55, y: 0.7, r: 0.25, colors: ['rgba(200,60,120,0.2)', 'rgba(120,30,80,0.08)', 'rgba(10,10,20,0)'] },
-    { x: 0.35, y: 0.25, r: 0.28, colors: ['rgba(80,180,220,0.18)', 'rgba(40,100,160,0.07)', 'rgba(10,10,20,0)'] },
-    { x: 0.9, y: 0.6, r: 0.22, colors: ['rgba(180,80,200,0.2)', 'rgba(100,40,140,0.08)', 'rgba(10,10,20,0)'] },
-  ];
-
-  nebulae.forEach(n => {
-    const grd = ctx.createRadialGradient(
-      n.x * width, n.y * height, 0,
-      n.x * width, n.y * height, n.r * width
-    );
-    grd.addColorStop(0, n.colors[0]);
-    grd.addColorStop(0.5, n.colors[1]);
-    grd.addColorStop(1, n.colors[2]);
-    ctx.fillStyle = grd;
-    ctx.fillRect(0, 0, width, height);
-  });
-
-  // Wispy cloud layers using noise-like random passes
-  for (let pass = 0; pass < 4; pass++) {
-    for (let i = 0; i < 800; i++) {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      const r = 15 + Math.random() * 100;
-      const hue = Math.random() < 0.5 ? 220 + Math.random() * 40 : 10 + Math.random() * 30;
-      const sat = 40 + Math.random() * 40;
-      const light = 30 + Math.random() * 30;
-      const alpha = 0.01 + Math.random() * 0.04;
-      const grd = ctx.createRadialGradient(x, y, 0, x, y, r);
-      grd.addColorStop(0, `hsla(${hue},${sat}%,${light}%,${alpha})`);
-      grd.addColorStop(1, 'transparent');
-      ctx.fillStyle = grd;
-      ctx.fillRect(x - r, y - r, r * 2, r * 2);
-    }
-  }
-
-  // Stars baked into the texture (single pixel dots — won't visibly stretch)
-  for (let i = 0; i < 2000; i++) {
-    const x = Math.random() * width;
-    const y = Math.random() * height;
-    const brightness = 0.3 + Math.random() * 0.7;
-    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
-    ctx.fillRect(Math.floor(x), Math.floor(y), 1, 1);
-  }
-
-  // A few brighter stars (2-3px)
-  for (let i = 0; i < 200; i++) {
-    const x = Math.random() * width;
-    const y = Math.random() * height;
-    const brightness = 0.5 + Math.random() * 0.5;
-    ctx.fillStyle = `rgba(255,255,255,${brightness})`;
-    ctx.fillRect(Math.floor(x), Math.floor(y), 2, 1);
-    ctx.fillRect(Math.floor(x), Math.floor(y), 1, 2);
-  }
-
-  // Handful of bright star glows
-  for (let i = 0; i < 15; i++) {
-    const x = Math.random() * width;
-    const y = Math.random() * height;
-    const glow = ctx.createRadialGradient(x, y, 0, x, y, 4 + Math.random() * 6);
-    const hue = Math.random() < 0.5 ? 210 + Math.random() * 30 : 30 + Math.random() * 20;
-    glow.addColorStop(0, `hsla(${hue},50%,90%,0.6)`);
-    glow.addColorStop(0.4, `hsla(${hue},50%,70%,0.15)`);
-    glow.addColorStop(1, 'transparent');
-    ctx.fillStyle = glow;
-    ctx.fillRect(x - 10, y - 10, 20, 20);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.needsUpdate = true;
-  return texture;
-}
-
-// Space skybox — cube geometry eliminates sphere grid artifacts
-function Starfield() {
-  const spaceTexture = useMemo(() => generateSpaceTexture(), []);
-
-  return (
-    <mesh>
-      <boxGeometry args={[100, 100, 100]} />
-      <meshBasicMaterial map={spaceTexture} side={THREE.BackSide} />
-    </mesh>
-  );
-}
+// No Three.js skybox — nebula is rendered as a CSS background behind the transparent canvas
 
 // Atmospheric glow around the globe
 function Atmosphere() {
@@ -251,7 +151,6 @@ function GlobeScene({ onSelectLanguage }) {
       <directionalLight position={[-5, -2, -5]} intensity={0.6} />
       <pointLight position={[0, 10, 0]} intensity={0.5} />
 
-      <Starfield />
       <EarthGlobe />
       <Atmosphere />
 
@@ -278,12 +177,31 @@ function GlobeScene({ onSelectLanguage }) {
   );
 }
 
+const spaceBackground = {
+  width: '100%',
+  height: '100%',
+  position: 'relative',
+  background: [
+    'radial-gradient(ellipse at 25% 45%, rgba(60,100,220,0.3) 0%, transparent 50%)',
+    'radial-gradient(ellipse at 70% 35%, rgba(220,80,50,0.25) 0%, transparent 45%)',
+    'radial-gradient(ellipse at 50% 50%, rgba(255,180,80,0.15) 0%, transparent 35%)',
+    'radial-gradient(ellipse at 15% 70%, rgba(140,50,180,0.18) 0%, transparent 45%)',
+    'radial-gradient(ellipse at 80% 20%, rgba(40,140,220,0.2) 0%, transparent 40%)',
+    'radial-gradient(ellipse at 60% 75%, rgba(200,60,120,0.15) 0%, transparent 40%)',
+    'radial-gradient(ellipse at 35% 20%, rgba(80,180,220,0.12) 0%, transparent 40%)',
+    'radial-gradient(ellipse at 90% 60%, rgba(160,70,200,0.15) 0%, transparent 35%)',
+    'radial-gradient(ellipse at 45% 40%, rgba(255,150,50,0.1) 0%, transparent 30%)',
+    '#06090f',
+  ].join(', '),
+};
+
 export default function Globe({ onSelectLanguage }) {
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={spaceBackground}>
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
-        style={{ background: '#06090f' }}
+        style={{ background: 'transparent', position: 'absolute', inset: 0 }}
+        gl={{ alpha: true }}
       >
         <GlobeScene onSelectLanguage={onSelectLanguage} />
       </Canvas>
